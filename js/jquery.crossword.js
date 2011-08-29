@@ -34,7 +34,9 @@
 				cols = [],
 				targetProblem,
 				currVal,
-				valToCheck;
+				valToCheck,
+				tabindex,
+				arrowTarget;
 					
 				// first task is reorder the problems array numerically by position
 				// Then listing clues in order is much easier
@@ -43,14 +45,65 @@
 				});
 				
 				// Set keyup handlers for the 'entry' inputs that will be added presently
-				puzzEl.delegate('input', 'keyup', function(e) {				
+				puzzEl.delegate('input', 'keyup', function(e) {						
+					
+					// run check answer routine
 					if ($(this).val() !== "") {
 						// check current input against answerer. If true, disable inputs
 						checkAnsw($(this).parent());
 					}
 					
+					
+					/*
+						left, right, up and down keystrokes
+					*/
+					console.log(e.keyCode);
+					switch(e.keyCode) {
+						case 39:
+							arrowTarget = $(this).parent().next().find('input');
+							arrowTarget.select();
+							break;
+							
+						case 37:
+							arrowTarget = $(this).parent().prev().find('input');
+							arrowTarget.select();							
+							break;
+							
+						case 40:
+							var targ;
+							arrowTarget = $(this).parent().prop('class').split(' ');
+							targ = $(this).parent().next('.entry-' + arrowTarget[0].split('-')[1]);
+							$(targ).children('input').select;
+							
+							break;
+						
+						case 38:
+						
+							break;
+						
+						default:
+						break;
+					}
+					
+					/*
+						// If at the last entry, tab cycles input focus back to first entry
+						// There's a visual hitch that will be fixed later		
+					*/
+				/*
+					if( tabindex === puzz.probs.length-1 && e.keyCode === 9) {	
+						$('.entry-1 input:eq(0)').focus()
+						$('.entry-1 input:eq(0)').select();
+					} 
+					tabindex = $(this).prop('tabindex');
+					if(tabindex === 0 && $(this).val() === ""){
+							$('.entry-1 input:eq(0)').focus()
+							$('.entry-1 input:eq(0)').select();
+					}
+				*/
+					return false;
 				});
 				
+				// highlight the letter in selected 'light' - better ux
 				puzzEl.delegate('input', 'click', function() {				
 					this.focus();
 					this.select();
@@ -110,17 +163,18 @@
 				var puzzCells = $('#puzzle td'),
 					light,
 					$groupedLights,
-					tabIndexCount = 1;
+					tabindex;
 
 				for (var x=0, p = probs; x < p; ++x) {
 					for (var i=0; i < entries[x].length; ++i) {
 						light = $(puzzCells +'[data-coords="' + entries[x][i] + '"]');
 						if($(light).empty()){
+							tabindex = 'tabindex="' + x+i +'"';
+							//tabindex = i === 0 ? 'tabindex="' + x + '"' : '';
 							$(light)
 								.addClass('entry-' + (x+1))
-								.append('<input maxlength="1" val="" type="text" tabindex="'+tabIndexCount+'" />');
+								.append('<input maxlength="1" val="" type="text" ' + tabindex + ' />');
 						}
-						++tabIndexCount;
 					};
 		
 				};
@@ -143,19 +197,32 @@
 				
 				// 3. Run a check on keyup to see if answerer matches current value
 				checkAnsw = function(cell) {
-					var classes = $(cell).prop('class').split(' ');
-					
-					for (var i=0, c = classes.length; i < c; ++i) {
-						targetProblem = classes[i].split('-')[1];
-						valToCheck = puzz.probs[targetProblem-1].answer.toLowerCase();
-						currVal = $('.entry-' + targetProblem + ' input').map(function() {
-						  			return $(this).val().toLowerCase();
-								  }).get().join('');
+						var classes = $(cell).prop('class').split(' ');
+							
+						for (var i=0, c = classes.length; i < c; ++i) {
+							targetProblem = classes[i].split('-')[1];
+							valToCheck = puzz.probs[targetProblem-1].answer.toLowerCase();
+							currVal = $('.entry-' + targetProblem + ' input').map(function() {
+							  			return $(this).val().toLowerCase();
+									  }).get().join('');
+
+							if(valToCheck === currVal) {
+								$('.entry-' + targetProblem)
+									.addClass('done');
+														
+							}
 						
-						if(valToCheck === currVal) {
-							$('.entry-' + targetProblem + ' input').css({'color' :'#000000', 'font-weight': 'bold'}).prop('disabled', true);
-						}
-					};
+							/*
+							if(valToCheck !== currVal && i === 1){
+								$('.entry-' + targetProblem).removeClass('done');	
+							}
+							*/
+
+						
+							// Need to flip tabindexes around so tabbing will move through intersecting inputs that might have tabindex of other entry
+							//console.log(cell);
+							//$(targetProblem).prop('tabindex', targetProblem);
+						};
 										
 				};
 							
