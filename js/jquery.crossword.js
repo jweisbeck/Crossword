@@ -43,15 +43,17 @@
 				});
 				
 				// Set keyup handlers for the 'entry' inputs that will be added presently
-				puzzEl.delegate('input', 'keyup', function() {				
+				puzzEl.delegate('input', 'keyup', function(e) {				
 					if ($(this).val() !== "") {
-
-						$(this).val(function() {
-							return $(this).val().toLowerCase();	
-						});
 						// check current input against answerer. If true, disable inputs
 						checkAnsw($(this).parent());
 					}
+					
+				});
+				
+				puzzEl.delegate('input', 'click', function() {				
+					this.focus();
+					this.select();
 				});
 				
 				
@@ -143,7 +145,7 @@
 						targetProblem = classes[i].split('-')[1];
 						valToCheck = puzz.probs[targetProblem-1].answer.toLowerCase();
 						currVal = $('.entry-' + targetProblem + ' input').map(function() {
-						  			return $(this).val();
+						  			return $(this).val().toLowerCase();
 								  }).get().join('');
 						
 						if(valToCheck === currVal) {
