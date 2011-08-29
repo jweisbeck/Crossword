@@ -109,20 +109,23 @@
 				*/
 				var puzzCells = $('#puzzle td'),
 					light,
-					$groupedLights;
+					$groupedLights,
+					tabIndexCount = 1;
 
 				for (var x=0, p = probs; x < p; ++x) {
-					for (var i=0; i < entries[x].length; i++) {
+					for (var i=0; i < entries[x].length; ++i) {
 						light = $(puzzCells +'[data-coords="' + entries[x][i] + '"]');
 						if($(light).empty()){
 							$(light)
 								.addClass('entry-' + (x+1))
-								.append('<input maxlength="1" val="" type="text" />');
+								.append('<input maxlength="1" val="" type="text" tabindex="'+tabIndexCount+'" />');
 						}
-
+						++tabIndexCount;
 					};
-	
+		
 				};
+				
+				
 				
 				
 				/*
@@ -135,9 +138,10 @@
 					if(!$('.entry-' + i +':eq(0) span').length){
 						$groupedLights.eq(0).append('<span>' + puzz.probs[i-1].position + '</span>');
 					}
-				}
-					
-				// 2. Run a check on keyup to see if answerer matches current value
+				}	
+				
+				
+				// 3. Run a check on keyup to see if answerer matches current value
 				checkAnsw = function(cell) {
 					var classes = $(cell).prop('class').split(' ');
 					
