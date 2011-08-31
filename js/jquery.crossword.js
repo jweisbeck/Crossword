@@ -34,6 +34,7 @@
 				entryCount = puzz.data.length,
 				rows = [],
 				cols = [],
+				topPosition = [],
 				targetProblem,
 				currVal,
 				valToCheck,
@@ -63,7 +64,7 @@
 
 						// run check answer routine
 						if ($(e.target).val() !== "") {
-							puzInit.checkAnswer(parentEl);
+							puzInit.checkAnswer($(e.target).parent());
 						}
 						
 						pNav.arrowNav(e);
@@ -72,13 +73,16 @@
 					});
 
 					// tab navigation handler setup
-					$('body').delegate('li,input', 'keydown', function(e) {
+					$('body').delegate('li,input', 'keyup', function(e) {
+
 						if (e.keyCode === 9) {
 							pNav.tabNav(e);
 						}
-						
-					});
+						e.preventDefault();
 
+					});
+						
+					
 
 					// highlight the letter in selected 'light' - better ux than making user highlight letter with second action
 					puzzEl.delegate('#puzzle', 'click', function(e) {
@@ -154,38 +158,48 @@
 					- Adds coords class to <td> cells
 					- Adds tabindexes to <inputs> 
 				*/
-				buildEntries: function() {
+				buildEntries: function() {					
 					var puzzCells = $('#puzzle td'),
 						light,
 						$groupedLights,
-						tabindex;
-
-					for (var x=0, p = entryCount; x < p; ++x) {
-						for (var i=0; i < entries[x].length; ++i) {
-							light = $(puzzCells +'[data-coords="' + entries[x][i] + '"]');
+						tabindex,
+						hasOffset = false,
+						positionOffset = entryCount - puzz.data[puzz.data.length-1].position;
+						
+					for (var x=1, p = entryCount; x <= p; ++x) {
+						for (var i=0; i < entries[x-1].length; ++i) {
+							light = $(puzzCells +'[data-coords="' + entries[x-1][i] + '"]');
+							
+							// check if position propery on current go-round is same as previous. If so, it means there's across & down for the position
+							// Therefore you need to include the offset in the entry class number calc
+								if(x > 1 ){
+									if (puzz.data[x-1].position === puzz.data[x-2].position) {
+										hasOffset = true;
+									};
+								}
+							
 							if($(light).empty()){
 								//tabindex = 'tabindex="' + x*i +'"';
 								//tabindex = i === 0 ? 'tabindex="' + x + '"' : '';
 								tabindex = 'tabindex="-1"';
 								$(light)
-									.addClass('entry-' + (x+1))
+									.addClass('entry-' + (hasOffset ? x - positionOffset : x) )
 									.append('<input maxlength="1" val="" type="text" ' + tabindex + ' />');
 							}
 						};
 						
-
 					};	
 					
 					// Put entry number in first 'light' of each entry, skipping it if already present
-					for (var i=1, p = entryCount; i <= p; ++i) {
+					for (var i=1, p = entryCount; i < p; ++i) {
 						$groupedLights = $('.entry-' + i);
 						if(!$('.entry-' + i +':eq(0) span').length){
 							$groupedLights.eq(0)
-								.append('<span>' + puzz.data[i-1].position + '</span>');
+								.append('<span>' + puzz.data[i].position + '</span>');
 						}
 					}	
 					
-					util.highlightEntry(1);
+					//util.highlightEntry(1);
 										
 				},
 				
@@ -265,6 +279,8 @@
 					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
 				*/
 				tabNav: function(e) {
+					console.log(currentEntry);
+					
 					currentEntry = currentEntry === clueLiEls.length ? 0 : currentEntry;
 					
 					entryInputGroup ? entryInputGroup.css('backgroundColor', '#fff') : null;
@@ -273,6 +289,7 @@
 					clueLiEls[currentEntry].focus();
 					
 					++currentEntry;
+					
 					e.preventDefault();
 						
 				}
@@ -287,19 +304,17 @@
 					return td.prop('class').split(' ');
 				},
 				
-				classCount: function(td	) {
+				classCount: function(td) {
 					// takes a <td> cell as input, splits the classes returns the count
 					return td.prop('class').split(' ').length;					
 				},
 				
 				highlightEntry: function(entry) {
+					
 					entryInputGroup = $('.entry-' + entry + ' input');
-					entryInputGroup[0].focus();
-					entryInputGroup[0].select();
-					console.log(entry);
-					
-					console.log($(entryInputGroup).eq(0).parent().find('span').html());
-					
+					//entryInputGroup[0].focus();
+					//entryInputGroup[0].select();
+										
 					
 					entryInputGroup.css('backgroundColor', '#bbb');
 					
