@@ -30,11 +30,9 @@
 			// initialize some variables
 			var tbl = ['<table id="puzzle">'],
 			    puzzEl = this,
-				cluesAcross = $('#across'),
-				cluesDown = $('#down'),
-				entries = [], 
 				coords,
 				entryCount = puzz.data.length,
+				entries = [], 
 				rows = [],
 				cols = [],
 				topPosition = [],
@@ -43,8 +41,7 @@
 				valToCheck,
 				tabindex,
 				arrowTarget,
-				inputTmp,
-				currentEntry = 1,
+				activePosition = 1,
 				clueLiEls,
 				entryInputGroup;
 		
@@ -63,7 +60,7 @@
 					puzzEl.delegate('input', 'keyup', function(e) {
 						if (e.keyCode === 9) { // tabbing should always bounce back to clue lists
 							return false;
-						};
+						} 
 
 						// run check answer routine
 						if ($(e.target).val() !== "") {
@@ -76,17 +73,15 @@
 					});
 
 					// tab navigation handler setup
-					$('body').delegate('li,input', 'keyup', function(e) {
+					$('body').delegate('li,input', 'keydown', function(e) {
 
 						if (e.keyCode === 9) {
 							pNav.tabNav(e);
 						}
-						e.preventDefault();
 
 					});
 						
 					
-
 					// highlight the letter in selected 'light' - better ux than making user highlight letter with second action
 					puzzEl.delegate('#puzzle', 'click', function(e) {
 						$(e.target).focus();
@@ -241,41 +236,57 @@
 			var pNav = {
 				
 				arrowNav: function(e) {	
-					var el = $(e.target);
+					var el = $(e.target),
+						arrowTarg,
+						sel;
+											
+					// build selector for up/down arrows							
+					arrowTarget = util.classSplit($(e.target).parent());
+					sel = arrowTarget.length > 1 ? 
+						'.' + arrowTarget[0] + ' input,.' + arrowTarget[1] + ' input' :
+						'.' + arrowTarget[0] + ' input';	
+					
 					/*
 						left, right, up and down keystrokes
 					*/
 					switch(e.which) {
 						case 39:
-							// left arrow
-							arrowTarget = 	el.parent().next().find('input');
-							arrowTarget.select();
+							// left key
+							el.parent()
+								.next()
+								.find('input')
+								.select();
 							break;
 
 						case 37:
-							// right arrow
-							arrowTarget = el.parent().prev().find('input');
-							arrowTarget.select();							
+							// right key
+							el.parent()
+								.prev()
+								.find('input')
+								.select();
 							break;
 
 						case 40:
-							// down arrow
-							
-							arrowTarget = util.classSplit($(e.target).parent().prop('class'));
-
-							targ = el.parents().next('tr').find(' td.entry-' + prev + ' input');																
-							targ.focus()
-							targ.select();
+							//down key
+							el.parents()
+								.next('tr')
+								.find(sel)
+								.select();
 							break;
 
 						case 38:
-							// up arrow
-
+						 	// up key
+							el.parents()
+								.prev('tr')
+								.find(sel)
+								.select();
 							break;
 
 						default:
 						break;
 					}
+					
+					e.preventDefault();
 				},
 				
 				/*
@@ -283,23 +294,25 @@
 				*/
 				tabNav: function(e) {
 
-					currentEntry = currentEntry >= clueLiEls.length ? 0 : currentEntry;
-					entryInputGroup ? entryInputGroup.css('backgroundColor', '#fff') : null;
+					activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
+					entryInputGroup ? entryInputGroup.removeClass('active') : null;
+					$('#puzzle-clues').find('.clues-active').removeClass('clues-active');
 					
-					// we're saying we want the ENTRY of the current POSITION
-					goToEntry = clueLiEls.eq(currentEntry).data('entry'); 
+					// we're saying we want the ENTRY number of the current POSITION
+					goToEntry = clueLiEls.eq(activePosition).data('entry'); 
 					
-					// go back to one if tabbed past the end of the list
+					// go back to first clue if tabbed past the end of the list
 					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
 					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
 					
+					$(clueLiEls[activePosition]).addClass('clues-active').focus();
 					
-					clueLiEls[currentEntry].focus();
-					++currentEntry;
+					$('.active').eq(0).focus();
+					$('.active').eq(0).select();
+					++activePosition;
 					e.preventDefault();
 						
-				}
-				
+				}				
 								
 			} // end pNav object
 
@@ -318,11 +331,11 @@
 				highlightEntry: function(entry) {
 					
 					entryInputGroup = $('.entry-' + entry + ' input');
-					//entryInputGroup[0].focus();
-					//entryInputGroup[0].select();
+					console.log(entryInputGroup);
+					//$(entryInputGroup).focus();
+					//$(entryInputGroup).select();
 										
-					
-					entryInputGroup.css('backgroundColor', '#bbb');
+					entryInputGroup.addClass('active');
 					
 				}
 				
