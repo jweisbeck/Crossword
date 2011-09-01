@@ -50,7 +50,7 @@
 			var puzInit = {
 				
 				init: function() {
-					// Reorder the problems array numerically by position
+					// Reorder the problems array ascending by POSITION
 					puzz.data.sort(function(a,b) {
 						return a.position - b.position;
 					});
@@ -96,12 +96,12 @@
 				},
 				
 				/*
-					- Given beginning coordinates, calculate all coordinates for entries
+					- Given beginning coordinates, calculate all coordinates for entries, puts them into entries array
 					- Builds clue markup and puts screen focus on the first one
 				*/
 				calcCoords: function() {
 					/*
-						Given beginning coordinates, calculate all coordinates for entries
+						Calculate all puzzle entry coordinates, put into entries array
 					*/
 					for (var i = 0, p = entryCount; i < p; ++i) {		
 						// set up array of coordinates for each problem
@@ -157,13 +157,13 @@
 					- Adds entry class(es) to <td> cells
 					- Adds tabindexes to <inputs> 
 				*/
-				buildEntries: function() {					
+				buildEntries: function() {
 					var puzzCells = $('#puzzle td'),
 						light,
 						$groupedLights,
 						tabindex,
 						hasOffset = false,
-						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and total POSITIONS
+						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and highest POSITIONS
 						
 					for (var x=1, p = entryCount; x <= p; ++x) {
 						for (var i=0; i < entries[x-1].length; ++i) {
@@ -171,7 +171,7 @@
 							
 							// check if POSITION property of the entry on current go-round is same as previous. 
 							// If so, it means there's and across & down entry for the position.
-							// Therefore you need to include the offset in the entry class number calc.
+							// Therefore you need to include the offset in the entry class.
 							if(x > 1 ){
 								if (puzz.data[x-1].position === puzz.data[x-2].position) {
 									hasOffset = true;
@@ -183,6 +183,7 @@
 								//tabindex = i === 0 ? 'tabindex="' + x + '"' : '';
 								tabindex = 'tabindex="-1"';
 								$(light)
+									.attr('data-position', x)
 									.addClass('entry-' + (hasOffset ? x - positionOffset : x) )
 									.append('<input maxlength="1" val="" type="text" ' + tabindex + ' />');
 							}
@@ -200,9 +201,9 @@
 					}	
 					
 					util.highlightEntry(1);
-					$(cluesLiEls).eq(0).addClass('active');
-						$('.active').eq(0).focus();
-						$('.active').eq(0).select();
+					$('.active').eq(0).focus();
+					$('.active').eq(0).select();
+
 										
 				},
 				
@@ -227,14 +228,13 @@
 								$('td[data-coords="' + entries[targetProblem][x] + '"]')
 									.addClass('done');
 									//.children('input')
-									//.prop('disabled', true);		
+									//.prop('disabled', true);	
 							};
 						}
 
 					};
 				}
 								
-			
 			} // end puzInit object
 			
 
@@ -311,9 +311,9 @@
 					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
 					
 					$(clueLiEls[activePosition]).addClass('clues-active').focus();
-					
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
+
 					++activePosition;
 					e.preventDefault();
 						
@@ -336,7 +336,6 @@
 				highlightEntry: function(entry) {
 					entryInputGroup = $('.entry-' + entry + ' input');
 					entryInputGroup.addClass('active');
-					
 				}
 				
 			} // end util object
