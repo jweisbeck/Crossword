@@ -1,3 +1,4 @@
+
 /**
 * Jesse Weisbeck's Crossword Puzzle (for all 3 people left who want to play them)
 *
@@ -9,6 +10,8 @@
 				"light" refers to a white box - or an input
 				"entry" refers to a single crossword problem
 				DEV NOTES: 
+				- ENTRY refers to the canonical problem in the puzzle, i.e. 2 down or 3 across.
+				- POSITION refers to the problem's array position in the list of problems
 				- This puzzle isn't designed to securely hide answerers. A user can see answerers in the js source
 					- An xhr provision can be added later to hit an endpoint on keyup to check the answerer
 				- The ordering of the array of problems doesn't matter. The position & orientation properties is enough information
@@ -199,7 +202,7 @@
 						}
 					}	
 					
-					//util.highlightEntry(1);
+					util.highlightEntry(1);
 										
 				},
 				
@@ -279,17 +282,20 @@
 					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
 				*/
 				tabNav: function(e) {
-					console.log(currentEntry);
-					
-					currentEntry = currentEntry === clueLiEls.length ? 0 : currentEntry;
-					
+
+					currentEntry = currentEntry >= clueLiEls.length ? 0 : currentEntry;
 					entryInputGroup ? entryInputGroup.css('backgroundColor', '#fff') : null;
-					util.highlightEntry($(e.target).data('entry'));
-										
+					
+					// we're saying we want the ENTRY of the current POSITION
+					goToEntry = clueLiEls.eq(currentEntry).data('entry'); 
+					
+					// go back to one if tabbed past the end of the list
+					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
+					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
+					
+					
 					clueLiEls[currentEntry].focus();
-					
 					++currentEntry;
-					
 					e.preventDefault();
 						
 				}
