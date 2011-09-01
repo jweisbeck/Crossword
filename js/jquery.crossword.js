@@ -135,10 +135,11 @@
 					
 				},
 				
+				/*
+					Build the table markup
+					- adds [data-coords] to each <td> cell
+				*/
 				buildTable: function() {
-					/*
-						Build the table markup
-					*/	
 					for (var i=1; i <= rows; ++i) {
 						tbl.push("<tr>");
 							for (var x=1; x <= cols; ++x) {
@@ -153,7 +154,7 @@
 				
 				/*
 					Builds entries into table
-					- Adds coords class to <td> cells
+					- Adds entry class(es) to <td> cells
 					- Adds tabindexes to <inputs> 
 				*/
 				buildEntries: function() {					
@@ -162,19 +163,20 @@
 						$groupedLights,
 						tabindex,
 						hasOffset = false,
-						positionOffset = entryCount - puzz.data[puzz.data.length-1].position;
+						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and total POSITIONS
 						
 					for (var x=1, p = entryCount; x <= p; ++x) {
 						for (var i=0; i < entries[x-1].length; ++i) {
 							light = $(puzzCells +'[data-coords="' + entries[x-1][i] + '"]');
 							
-							// check if position propery on current go-round is same as previous. If so, it means there's across & down for the position
-							// Therefore you need to include the offset in the entry class number calc
-								if(x > 1 ){
-									if (puzz.data[x-1].position === puzz.data[x-2].position) {
-										hasOffset = true;
-									};
-								}
+							// check if POSITION property of the entry on current go-round is same as previous. 
+							// If so, it means there's and across & down entry for the position.
+							// Therefore you need to include the offset in the entry class number calc.
+							if(x > 1 ){
+								if (puzz.data[x-1].position === puzz.data[x-2].position) {
+									hasOffset = true;
+								};
+							}
 							
 							if($(light).empty()){
 								//tabindex = 'tabindex="' + x*i +'"';
@@ -198,6 +200,9 @@
 					}	
 					
 					util.highlightEntry(1);
+					$(cluesLiEls).eq(0).addClass('active');
+						$('.active').eq(0).focus();
+						$('.active').eq(0).select();
 										
 				},
 				
@@ -329,12 +334,7 @@
 				},
 				
 				highlightEntry: function(entry) {
-					
 					entryInputGroup = $('.entry-' + entry + ' input');
-					console.log(entryInputGroup);
-					//$(entryInputGroup).focus();
-					//$(entryInputGroup).select();
-										
 					entryInputGroup.addClass('active');
 					
 				}
