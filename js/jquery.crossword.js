@@ -58,16 +58,19 @@
 
 					// Set keyup handlers for the 'entry' inputs that will be added presently
 					puzzEl.delegate('input', 'keyup', function(e) {
-						if (e.keyCode === 9) { // tabbing should always bounce back to clue lists
+						if ( e.keyCode === 9) { // tabbing should always bounce back to clue lists
 							return false;
-						} 
-
-						// run check answer routine
-						if ($(e.target).val() !== "") {
-							puzInit.checkAnswer($(e.target).parent());
+						} else if (
+							e.keyCode === 37 ||
+							e.keyCode === 38 ||
+							e.keyCode === 39 ||
+							e.keyCode === 40
+							) {
+								pNav.arrowNav(e);
+								return;	
 						}
-						
-						pNav.arrowNav(e);
+												
+						puzInit.checkAnswer(e.target);
 						
 						e.preventDefault();
 					});
@@ -183,8 +186,7 @@
 								//tabindex = i === 0 ? 'tabindex="' + x + '"' : '';
 								tabindex = 'tabindex="-1"';
 								$(light)
-									.attr('data-position', x)
-									.addClass('entry-' + (hasOffset ? x - positionOffset : x) )
+									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + x )
 									.append('<input maxlength="1" val="" type="text" ' + tabindex + ' />');
 							}
 						};
@@ -203,29 +205,40 @@
 					util.highlightEntry(1);
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
-
 										
 				},
 				
 				checkAnswer: function(light) {
-					var classes = util.classSplit(light);
-					if(!classes){
-						return false;
+					
+					var light = $(light).parent();
+					
+					// run check answer routine
+					var classes = $(light).prop('class').split(' '),
+					classLen = classes.length,
+					toCheck = []; 
+					
+					// pluck out just the position classes
+					for(var i=0; i < classLen; ++i){
+						if (!classes[i].indexOf('position') ) {
+							toCheck.push(classes[i]);
+						}
 					}
-					for (var i=0, c = classes.length; i < c; ++i) {
-						targetProblem = (classes[i].split('-')[1])-1;
-						valToCheck = puzz.data[targetProblem].answer.toLowerCase();
+					
+					for (var i=0, c = toCheck.length; i < c; ++i) {
+						targetProblem = (toCheck[i].split('-')[1]);
+						valToCheck = puzz.data[targetProblem-1].answer.toLowerCase();
 						
-						currVal = $('.entry-' + (targetProblem+1) + ' input')
-							.map(function() {
+						currVal = $('.position-' + (targetProblem) + ' input')
+							.map(function() {								
 						  		return $(this).val().toLowerCase();
 							})
 							.get()
 							.join('');
-
-						if(valToCheck === currVal){
-							for (var x=0; x < entries[targetProblem].length; ++x) {
-								$('td[data-coords="' + entries[targetProblem][x] + '"]')
+													
+						if(valToCheck === currVal){							
+							for (var x=0; x < entries[targetProblem-1].length; ++x) {
+								
+								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
 									.addClass('done');
 									//.children('input')
 									//.prop('disabled', true);	
@@ -242,6 +255,8 @@
 				
 				arrowNav: function(e) {	
 					var el = $(e.target),
+						p = el.parent(),
+						ps = el.parents(),
 						arrowTarg,
 						sel;
 											
@@ -257,7 +272,7 @@
 					switch(e.which) {
 						case 39:
 							// left key
-							el.parent()
+							p
 								.next()
 								.find('input')
 								.select();
@@ -265,7 +280,7 @@
 
 						case 37:
 							// right key
-							el.parent()
+							p
 								.prev()
 								.find('input')
 								.select();
@@ -273,7 +288,7 @@
 
 						case 40:
 							//down key
-							el.parents()
+							ps
 								.next('tr')
 								.find(sel)
 								.select();
@@ -281,7 +296,7 @@
 
 						case 38:
 						 	// up key
-							el.parents()
+							ps
 								.prev('tr')
 								.find(sel)
 								.select();
@@ -290,6 +305,9 @@
 						default:
 						break;
 					}
+					console.log(el.parent());
+					
+					pNav.highlightEntry($(e.target).parent().prop('class')[0]);
 					
 					e.preventDefault();
 				},
