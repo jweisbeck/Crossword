@@ -43,7 +43,9 @@
 				arrowTarget,
 				activePosition = 1,
 				clueLiEls,
-				entryInputGroup;
+				entryInputGroup,
+				currOrientation,
+				currSelectedInput;
 		
 			
 			
@@ -58,6 +60,9 @@
 
 					// Set keyup handlers for the 'entry' inputs that will be added presently
 					puzzEl.delegate('input', 'keyup', function(e) {
+						// store current input so we can auto-select next one
+						currSelectedInput = $(e.target);
+						
 						if ( e.keyCode === 9) { // tabbing should always bounce back to clue lists
 							return false;
 						} else if (
@@ -118,7 +123,7 @@
 						}
 
 						// while we're in here, add clues to DOM!
-						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-entry="' + puzz.data[i].position + '" data-orientation="' + puzz.data[i].orientation + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
+						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-entry="' + puzz.data[i].position + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
 					}				
 					
 					// immediately put mouse focus on first clue
@@ -208,6 +213,10 @@
 										
 				},
 				
+				/*
+					- Checks current entry input group value against answer
+					- If not complete, auto-selects next input for user
+				*/
 				checkAnswer: function(light) {
 					
 					var light = $(light).parent(),
@@ -220,7 +229,9 @@
 						
 						currVal = $('.position-' + (targetProblem) + ' input')
 							.map(function() {								
-						  		return $(this).val().toLowerCase();
+						  		return $(this)
+									.val()
+									.toLowerCase();
 							})
 							.get()
 							.join('');
@@ -231,10 +242,17 @@
 								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
 									.addClass('done');
 									
-								$('.active').removeClass('active');		
-							};
+								$('.active')
+									.removeClass('active');		
+							}
+							return;
 						}
-
+						
+						if(entries[targetProblem-1].length > currVal.length && currVal !== ""){
+							// User not yet at last input, so auto-select next one!
+							currOrientation === 'across' ? pNav.arrowNav(currSelectedInput, 39) : pNav.arrowNav(currSelectedInput, 40);
+						}
+						
 					};
 				}
 								
@@ -243,19 +261,33 @@
 
 			var pNav = {
 				
-				arrowNav: function(e) {	
-					var el = $(e.target),
-						p = el.parent(),
-						ps = el.parents(),
-						arrowTarget,
-						sel;
-											
+				arrowNav: function(e, override) {
+					if(!override) {	
+						var el = $(e.target),
+							p = el.parent(),
+							ps = el.parents(),
+							currentPosition,
+							sel;
+																	
+						e.preventDefault();
+						
+					} else {
+						// working off currently selected input, so auto-select next 'light' 
+						// in this entry
+						e.which = override;
+						var el = e,
+							p = el.parent(),
+							ps = el.parents(),
+							currentPosition,
+							sel;
+					}
+					
 					// build selector for up/down arrows												
 					currentPosition = util.getPositions(ps);
 					sel = currentPosition .length > 1 ? 
 						'.' + currentPosition[0] + ' input,.' + currentPosition[1] + ' input' :
 						'.' + currentPosition[0] + ' input';
-					
+
 					/*
 						left, right, up and down keystrokes
 					*/
@@ -298,8 +330,6 @@
 					
 					//toHighlight = util.getPositions(el.parent());
 					//util.highlightEntry(toHighlight);
-					
-					e.preventDefault();
 				},
 				
 				/*
@@ -321,6 +351,10 @@
 					$(clueLiEls[activePosition]).addClass('clues-active').focus();
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
+					
+					// store orientation for auto-selecting next input
+					currOrientation = $('.clues-active').parent('ul').prop('id');
+						
 
 					++activePosition;
 					e.preventDefault();
