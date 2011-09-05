@@ -79,9 +79,15 @@
 						
 						e.preventDefault();
 					});
+					
+					puzzEl.delegate('li', 'click', function(e) {
+							pNav.clickNav(e);
+							e.preventDefault(); 
+					});
+					
 
 					// tab navigation handler setup
-					$('#puzzle-wrapper').delegate('li,input', 'keydown', function(e) {
+					puzzEl.delegate('li,input', 'keydown', function(e) {
 
 						if (e.keyCode === 9) {
 							pNav.tabNav(e);
@@ -272,7 +278,6 @@
 							currentPosition,
 							sel;
 									
-						currOrientation = "";								
 						e.preventDefault();
 						
 					} else {
@@ -302,6 +307,7 @@
 								.next()
 								.find('input')
 								.select();
+							currOrientation = "across";
 							break;
 
 						case 37:
@@ -310,6 +316,7 @@
 								.prev()
 								.find('input')
 								.select();
+							currOrientation = "across";
 							break;
 
 						case 40:
@@ -318,6 +325,7 @@
 								.next('tr')
 								.find(sel)
 								.select();
+							currOrientation = "down";
 							break;
 
 						case 38:
@@ -326,6 +334,7 @@
 								.prev('tr')
 								.find(sel)
 								.select();
+							currOrientation = "down";
 							break;
 
 						default:
@@ -352,7 +361,9 @@
 					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
 					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
 					
-					$(clueLiEls[activePosition]).addClass('clues-active').focus();
+					$(clueLiEls[activePosition])
+						.addClass('clues-active')
+						.focus();
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
 					
@@ -363,7 +374,11 @@
 					++activePosition;
 					e.preventDefault();
 						
-				}				
+				},				
+			
+				clickNav: function(e) {
+					// handle clicks on clues - should have same result and ui as tab nav
+				}
 								
 			} // end pNav object
 
