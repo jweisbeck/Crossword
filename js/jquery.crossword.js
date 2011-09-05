@@ -81,7 +81,7 @@
 					});
 
 					// tab navigation handler setup
-					$('body').delegate('li,input', 'keydown', function(e) {
+					$('#puzzle-wrapper').delegate('li,input', 'keydown', function(e) {
 
 						if (e.keyCode === 9) {
 							pNav.tabNav(e);
@@ -243,12 +243,15 @@
 									.addClass('done');
 									
 								$('.active')
-									.removeClass('active');		
+									.removeClass('active');	
+								
+								$('.clues-active').css('text-decoration', 'line-through');
+									
 							}
 							return;
 						}
 						
-						if(entries[targetProblem-1].length > currVal.length && currVal !== ""){
+						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOrientation !== ""){
 							// User not yet at last input, so auto-select next one!
 							currOrientation === 'across' ? pNav.arrowNav(currSelectedInput, 39) : pNav.arrowNav(currSelectedInput, 40);
 						}
@@ -268,7 +271,8 @@
 							ps = el.parents(),
 							currentPosition,
 							sel;
-																	
+									
+						currOrientation = "";								
 						e.preventDefault();
 						
 					} else {
