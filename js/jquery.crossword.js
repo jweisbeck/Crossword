@@ -250,11 +250,11 @@
 						arrowTarget,
 						sel;
 											
-					// build selector for up/down arrows							
-					arrowTarget = util.classSplit($(e.target).parent());
-					sel = arrowTarget.length > 1 ? 
-						'.' + arrowTarget[0] + ' input,.' + arrowTarget[1] + ' input' :
-						'.' + arrowTarget[0] + ' input';	
+					// build selector for up/down arrows												
+					currentPosition = util.getPositions(ps);
+					sel = currentPosition .length > 1 ? 
+						'.' + currentPosition[0] + ' input,.' + currentPosition[1] + ' input' :
+						'.' + currentPosition[0] + ' input';
 					
 					/*
 						left, right, up and down keystrokes
@@ -286,7 +286,6 @@
 
 						case 38:
 						 	// up key
-						console.log('trace me');
 							ps
 								.prev('tr')
 								.find(sel)
