@@ -173,8 +173,8 @@
 							light = $(puzzCells +'[data-coords="' + entries[x-1][i] + '"]');
 							
 							// check if POSITION property of the entry on current go-round is same as previous. 
-							// If so, it means there's and across & down entry for the position.
-							// Therefore you need to include the offset in the entry class.
+							// If so, it means there's an across & down entry for the position.
+							// Therefore you need to subtract the offset when applying the entry class.
 							if(x > 1 ){
 								if (puzz.data[x-1].position === puzz.data[x-2].position) {
 									hasOffset = true;
@@ -210,19 +210,9 @@
 				
 				checkAnswer: function(light) {
 					
-					var light = $(light).parent();
+					var light = $(light).parent(),
+					toCheck = util.getPositions(light);
 					
-					// run check answer routine
-					var classes = $(light).prop('class').split(' '),
-					classLen = classes.length,
-					toCheck = []; 
-					
-					// pluck out just the position classes
-					for(var i=0; i < classLen; ++i){
-						if (!classes[i].indexOf('position') ) {
-							toCheck.push(classes[i]);
-						}
-					}
 					
 					for (var i=0, c = toCheck.length; i < c; ++i) {
 						targetProblem = (toCheck[i].split('-')[1]);
@@ -236,12 +226,12 @@
 							.join('');
 													
 						if(valToCheck === currVal){							
-							for (var x=0; x < entries[targetProblem-1].length; ++x) {
+							for (var x=0, e = entries[targetProblem-1].length; x < e; ++x) {
 								
 								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
 									.addClass('done');
-									//.children('input')
-									//.prop('disabled', true);	
+									
+								$('.active').removeClass('active');		
 							};
 						}
 
@@ -257,7 +247,7 @@
 					var el = $(e.target),
 						p = el.parent(),
 						ps = el.parents(),
-						arrowTarg,
+						arrowTarget,
 						sel;
 											
 					// build selector for up/down arrows							
@@ -296,6 +286,7 @@
 
 						case 38:
 						 	// up key
+						console.log('trace me');
 							ps
 								.prev('tr')
 								.find(sel)
@@ -305,9 +296,9 @@
 						default:
 						break;
 					}
-					console.log(el.parent());
 					
-					pNav.highlightEntry($(e.target).parent().prop('class')[0]);
+					//toHighlight = util.getPositions(el.parent());
+					//util.highlightEntry(toHighlight);
 					
 					e.preventDefault();
 				},
@@ -319,7 +310,7 @@
 
 					activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
 					entryInputGroup ? entryInputGroup.removeClass('active') : null;
-					$('#puzzle-clues').find('.clues-active').removeClass('clues-active');
+					$('#puzzle-clues .clues-active').removeClass('clues-active');
 					
 					// we're saying we want the ENTRY number of the current POSITION
 					goToEntry = clueLiEls.eq(activePosition).data('entry'); 
@@ -354,6 +345,21 @@
 				highlightEntry: function(entry) {
 					entryInputGroup = $('.entry-' + entry + ' input');
 					entryInputGroup.addClass('active');
+				},
+				
+				getPositions: function(light) {
+					var classes = $(light).prop('class').split(' '),
+					classLen = classes.length,
+					positions = []; 
+
+					// pluck out just the position classes
+					for(var i=0; i < classLen; ++i){
+						if (!classes[i].indexOf('position') ) {
+							positions.push(classes[i]);
+						}
+					}
+					
+					return positions;
 				}
 				
 			} // end util object
