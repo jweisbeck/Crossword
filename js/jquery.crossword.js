@@ -47,8 +47,7 @@
 				currOri,
 				currSelectedInput;
 		
-			
-			
+		
 			var puzInit = {
 				
 				init: function() {
@@ -351,40 +350,13 @@
 					entryInputGroup ? entryInputGroup.removeClass('active') : null;
 					$('#puzzle-clues .clues-active').removeClass('clues-active');
 					
-				
+					// skip past any next clues that have already been solved
+					// getSkips() sets activePosition to the next unsolved entry
+					util.getSkips(activePosition);
+	
 					// we're saying we want the ENTRY number of the current POSITION
-					goToEntry = clueLiEls.eq(activePosition).data('entry'); 
-
-					// skip past a clue that's already been solved
-					if ($(clueLiEls[activePosition]).hasClass('clue-done')){
-						// go to the next position, or back to 1 if at end
-						var currLoc = false,
-							toSkipCount = 0;
-
-						$(clueLiEls).each(function(i) {
-							currLoc = i === activePosition ? i : false;
-							
-							if(currLoc > 0){
-								
-								if ($(this).hasClass('clue-done')) {
-									++toSkipCount;
-								} else {
-									currLoc = false;
-								}
-								
-							}
-
-						});
+					goToEntry = clueLiEls.eq(activePosition).data('entry');
 												
-						activePosition += toSkipCount;
-						
-						activePosition = activePosition >= clueLiEls.length ? 0 + toSkipCount : activePosition;
-						
-						// we're saying we want the ENTRY number of the current POSITION
-						goToEntry = clueLiEls.eq(activePosition).data('entry');
-							
-					}
-					
 					// go back to first clue if tabbed past the end of the list
 					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
 					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
@@ -431,6 +403,15 @@
 					}
 					
 					return positions;
+				},
+
+				getSkips: function(position) {
+					if ($(clueLiEls[position]).hasClass('clue-done')){
+						activePosition = position >= clueLiEls.length ? 0 : ++activePosition;
+						util.getSkips(activePosition);						
+					} else {
+						return false;
+					}
 				}
 				
 			} // end util object
