@@ -44,7 +44,7 @@
 				activePosition = 1,
 				clueLiEls,
 				entryInputGroup,
-				currOrientation,
+				currOri,
 				currSelectedInput;
 		
 			
@@ -57,9 +57,8 @@
 						return a.position - b.position;
 					});
 
-
 					// Set keyup handlers for the 'entry' inputs that will be added presently
-					puzzEl.delegate('input', 'keyup', function(e) {
+					puzzEl.delegate('input', 'keyup', function(e){
 						// store current input so we can auto-select next one
 						currSelectedInput = $(e.target);
 						
@@ -69,10 +68,10 @@
 							e.keyCode === 37 ||
 							e.keyCode === 38 ||
 							e.keyCode === 39 ||
-							e.keyCode === 40
-							) {
-								pNav.arrowNav(e);
-								return;	
+							e.keyCode === 40 ) {
+								
+							pNav.nextPrevNav(e);
+							return;	
 						}
 												
 						puzInit.checkAnswer(e.target);
@@ -81,8 +80,8 @@
 					});
 					
 					puzzEl.delegate('li', 'click', function(e) {
-							pNav.clickNav(e);
-							e.preventDefault(); 
+						pNav.clickNav(e);
+						e.preventDefault(); 
 					});
 					
 
@@ -134,7 +133,8 @@
 					
 					// immediately put mouse focus on first clue
 					clueLiEls = $('#puzzle-clues li');
-					clueLiEls[0].focus();
+					$(clueLiEls[0]).addClass('clues-active').focus();
+
 
 					// Calculate rows/cols by finding max coords of each entry, then picking the highest
 					for (var i = 0, p = entryCount; i < p; ++i) {
@@ -213,7 +213,7 @@
 						}
 					}	
 					
-					util.highlightEntry(1);
+					util.highlightEntry(1, 'across');
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
 										
@@ -251,15 +251,15 @@
 								$('.active')
 									.removeClass('active');	
 								
-								$('.clues-active').css('text-decoration', 'line-through');
+								$('.clues-active').addClass('clue-done');
 									
 							}
 							return;
 						}
 						
-						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOrientation !== ""){
+						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOri !== ""){
 							// User not yet at last input, so auto-select next one!
-							currOrientation === 'across' ? pNav.arrowNav(currSelectedInput, 39) : pNav.arrowNav(currSelectedInput, 40);
+							currOri === 'across' ? pNav.nextPrevNav(currSelectedInput, 39) : pNav.nextPrevNav(currSelectedInput, 40);
 						}
 						
 					};
@@ -270,25 +270,21 @@
 
 			var pNav = {
 				
-				arrowNav: function(e, override) {
+				nextPrevNav: function(e, override) {
+					var el, p, ps, currentPosition, sel;
+					
 					if(!override) {	
-						var el = $(e.target),
-							p = el.parent(),
-							ps = el.parents(),
-							currentPosition,
-							sel;
-									
+						// using arrow key nav, so track native event bubble
+						el = $(e.target),
+						p = el.parent(),
+						ps = el.parents();									
 						e.preventDefault();
-						
 					} else {
-						// working off currently selected input, so auto-select next 'light' 
-						// in this entry
+						// deciding off currently selected input, so auto-select next 'light' 
 						e.which = override;
-						var el = e,
-							p = el.parent(),
-							ps = el.parents(),
-							currentPosition,
-							sel;
+						el = e,
+						p = el.parent(),
+						ps = el.parents();
 					}
 					
 					// build selector for up/down arrows												
@@ -307,7 +303,7 @@
 								.next()
 								.find('input')
 								.select();
-							currOrientation = "across";
+							currOri = "across";
 							break;
 
 						case 37:
@@ -316,7 +312,7 @@
 								.prev()
 								.find('input')
 								.select();
-							currOrientation = "across";
+							currOri = "across";
 							break;
 
 						case 40:
@@ -325,7 +321,7 @@
 								.next('tr')
 								.find(sel)
 								.select();
-							currOrientation = "down";
+							currOri = "down";
 							break;
 
 						case 38:
@@ -334,32 +330,65 @@
 								.prev('tr')
 								.find(sel)
 								.select();
-							currOrientation = "down";
+							currOri = "down";
 							break;
 
 						default:
 						break;
 					}
 					
-					//toHighlight = util.getPositions(el.parent());
-					//util.highlightEntry(toHighlight);
+					toHighlight = util.getPositions(el.parent());
+					util.highlightEntry(toHighlight, currOri);
 				},
 				
 				/*
 					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
 				*/
 				tabNav: function(e) {
+					
 
 					activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
 					entryInputGroup ? entryInputGroup.removeClass('active') : null;
 					$('#puzzle-clues .clues-active').removeClass('clues-active');
 					
+				
 					// we're saying we want the ENTRY number of the current POSITION
 					goToEntry = clueLiEls.eq(activePosition).data('entry'); 
+
+					// skip past a clue that's already been solved
+					if ($(clueLiEls[activePosition]).hasClass('clue-done')){
+						// go to the next position, or back to 1 if at end
+						var currLoc = false,
+							toSkipCount = 0;
+
+						$(clueLiEls).each(function(i) {
+							currLoc = i === activePosition ? i : false;
+							
+							if(currLoc > 0){
+								
+								if ($(this).hasClass('clue-done')) {
+									++toSkipCount;
+								} else {
+									currLoc = false;
+								}
+								
+							}
+
+						});
+												
+						activePosition += toSkipCount;
+						
+						activePosition = activePosition >= clueLiEls.length ? 0 + toSkipCount : activePosition;
+						
+						// we're saying we want the ENTRY number of the current POSITION
+						goToEntry = clueLiEls.eq(activePosition).data('entry');
+							
+					}
 					
 					// go back to first clue if tabbed past the end of the list
 					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
 					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
+					
 					
 					$(clueLiEls[activePosition])
 						.addClass('clues-active')
@@ -368,7 +397,7 @@
 					$('.active').eq(0).select();
 					
 					// store orientation for auto-selecting next input
-					currOrientation = $('.clues-active').parent('ul').prop('id');
+					currOri = $('.clues-active').parent('ul').prop('id');
 						
 
 					++activePosition;
@@ -384,17 +413,7 @@
 
 			
 			var util = {
-				classSplit: function(td) {
-					// takes a <td> cell as input, splits the classes returns them as an array
-					return td.prop('class').split(' ');
-				},
-				
-				classCount: function(td) {
-					// takes a <td> cell as input, splits the classes returns the count
-					return td.prop('class').split(' ').length;					
-				},
-				
-				highlightEntry: function(entry) {
+				highlightEntry: function(entry, ori) {
 					entryInputGroup = $('.entry-' + entry + ' input');
 					entryInputGroup.addClass('active');
 				},
