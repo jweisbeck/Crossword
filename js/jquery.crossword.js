@@ -51,6 +51,8 @@
 			var puzInit = {
 				
 				init: function() {
+					currOri = 'across'; // app's init orientation could move to config object
+					
 					// Reorder the problems array ascending by POSITION
 					puzz.data.sort(function(a,b) {
 						return a.position - b.position;
@@ -102,6 +104,11 @@
 					
 					// let's roll ...
 					puzInit.calcCoords();
+					
+					// Puzzle clues added to DOM in calcCoords(), so now immediately put mouse focus on first clue
+					clueLiEls = $('#puzzle-clues li');
+					$('#' + currOri + ' li' ).eq(0).addClass('clues-active').focus();
+									
 					puzInit.buildTable();
 					puzInit.buildEntries();
 										
@@ -130,11 +137,6 @@
 						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-entry="' + puzz.data[i].position + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
 					}				
 					
-					// immediately put mouse focus on first clue
-					clueLiEls = $('#puzzle-clues li');
-					$(clueLiEls[0]).addClass('clues-active').focus();
-
-
 					// Calculate rows/cols by finding max coords of each entry, then picking the highest
 					for (var i = 0, p = entryCount; i < p; ++i) {
 						for (var x=0; x < entries[i].length; x++) {
@@ -212,7 +214,7 @@
 						}
 					}	
 					
-					util.highlightEntry(1, 'across');
+					util.highlightEntry(1, currOri);
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
 										
@@ -225,11 +227,11 @@
 				checkAnswer: function(light) {
 					
 					var light = $(light).parent(),
-					toCheck = util.getPositions(light);
+					toCheck = util.getClasses(light, 'position');
 					
 					
 					for (var i=0, c = toCheck.length; i < c; ++i) {
-						targetProblem = (toCheck[i].split('-')[1]);
+						targetProblem = toCheck[i].split('-')[1];
 						valToCheck = puzz.data[targetProblem-1].answer.toLowerCase();
 						
 						currVal = $('.position-' + (targetProblem) + ' input')
@@ -240,20 +242,21 @@
 							})
 							.get()
 							.join('');
-													
+							
 						if(valToCheck === currVal){							
 							for (var x=0, e = entries[targetProblem-1].length; x < e; ++x) {
-								
+
 								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
 									.addClass('done');
+
 									
 								$('.active')
 									.removeClass('active');	
-								
+
+								// grey out and strike through clue for clear visual feedback
 								$('.clues-active').addClass('clue-done');
-									
+
 							}
-							return;
 						}
 						
 						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOri !== ""){
@@ -270,6 +273,7 @@
 			var pNav = {
 				
 				nextPrevNav: function(e, override) {
+										
 					var el, p, ps, currentPosition, sel;
 					
 					if(!override) {	
@@ -278,6 +282,10 @@
 						p = el.parent(),
 						ps = el.parents();									
 						e.preventDefault();
+						// user is arrowing around, no longer on tabbed-to clue, so remove visual hint
+						// a new tab strike will refocus clue highlight on tabbed-to clue
+						$('.clues-active').removeClass('clues-active');
+						
 					} else {
 						// deciding off currently selected input, so auto-select next 'light' 
 						e.which = override;
@@ -287,7 +295,7 @@
 					}
 					
 					// build selector for up/down arrows												
-					currentPosition = util.getPositions(ps);
+					currentPosition = util.getClasses(ps, 'position');
 					sel = currentPosition .length > 1 ? 
 						'.' + currentPosition[0] + ' input,.' + currentPosition[1] + ' input' :
 						'.' + currentPosition[0] + ' input';
@@ -335,20 +343,22 @@
 						default:
 						break;
 					}
+										
+					toHighlight = util.getClasses(el.parent(), 'position');
+					util.highlightEntry(el.parent(), currOri);
 					
-					toHighlight = util.getPositions(el.parent());
-					util.highlightEntry(toHighlight, currOri);
+					util.selectClue(el);
 				},
 				
 				/*
 					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
 				*/
 				tabNav: function(e) {
-					
 
 					activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
 					entryInputGroup ? entryInputGroup.removeClass('active') : null;
-					$('#puzzle-clues .clues-active').removeClass('clues-active');
+					$('.clues-active').removeClass('clues-active');
+					$('.active').removeClass('active');
 					
 					// skip past any next clues that have already been solved
 					// getSkips() sets activePosition to the next unsolved entry
@@ -356,7 +366,7 @@
 	
 					// we're saying we want the ENTRY number of the current POSITION
 					goToEntry = clueLiEls.eq(activePosition).data('entry');
-												
+																	
 					// go back to first clue if tabbed past the end of the list
 					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
 					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
@@ -365,10 +375,13 @@
 					$(clueLiEls[activePosition])
 						.addClass('clues-active')
 						.focus();
+					
+					
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
+				
 					
-					// store orientation for auto-selecting next input
+					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
 						
 
@@ -385,19 +398,23 @@
 
 			
 			var util = {
-				highlightEntry: function(entry, ori) {
+				highlightEntry: function(entry, ori) {				
 					entryInputGroup = $('.entry-' + entry + ' input');
 					entryInputGroup.addClass('active');
 				},
 				
-				getPositions: function(light) {
+				/*
+					- light refers to the parent <td> of input, where all the classes are applied
+					- type is either 'entry' or 'position', both of which are needed at different points
+				*/
+				getClasses: function(light, type) {
 					var classes = $(light).prop('class').split(' '),
 					classLen = classes.length,
 					positions = []; 
 
 					// pluck out just the position classes
 					for(var i=0; i < classLen; ++i){
-						if (!classes[i].indexOf('position') ) {
+						if (!classes[i].indexOf(type) ) {
 							positions.push(classes[i]);
 						}
 					}
@@ -412,7 +429,31 @@
 					} else {
 						return false;
 					}
+				},
+				
+				selectClue: function(el) {
+					$('.clues-active').removeClass('clues-active');
+					
+					var pos = util.getClasses($(el).parent(), 'position');
+					
+					for (var i=0, p = clueLiEls.length; i < p; i++) {
+						$(clueLiEls[ pos[i].split('-')[1]-1 ]).addClass('clues-active')
+					}
+					
 				}
+				
+				/*
+				selectClue: function(el, ori){
+					var entries = util.getClasses($(el).parent(), 'entry');
+					console.log(entries);
+					for (var i=0, p = entries.length; i < p; i++) {
+						
+						$('#puzzle-clues ul#' + ori + ' li[data-entry='+ entries[i].split('-')[1] +']')
+							.addClass('clues-active');
+					};
+
+				}
+				*/
 				
 			} // end util object
 
