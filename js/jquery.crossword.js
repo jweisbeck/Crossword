@@ -353,7 +353,7 @@
 					}
 										
 					
-					//util.highlightEntry(el.parent());
+					util.highlightEntry($('.active').parent());
 					util.selectClue();
 				},
 				
@@ -404,7 +404,7 @@
 
 			
 			var util = {
-				highlightEntry: function(entry, ori) {
+				highlightEntry: function(entry) {
 					entryInputGroup = $('.entry-' + entry + ' input');
 					entryInputGroup.addClass('active');
 				},
@@ -441,21 +441,23 @@
 				
 				selectClue: function() {
 					var targetInput = $('.active').parent();					
-					var pos = util.getClasses(targetInput, 'entry');
+					var pos,
+					 	classes = util.getClasses(targetInput, 'entry');
 
-					if(pos){
+					if(classes){
 						$('.clues-active').removeClass('clues-active');
 						
-						for (var i=0, p = pos.length; i < p; i++) {
-							$('ul#' + currOri + ' li' + '[data-entry= ' + pos[i].split('-')[1] + ']' ).addClass('clues-active');
-						
+						for (var i=0, c = classes.length; i < c; i++) {
+							pos = classes[i].split('-')[1];
+							$('ul#' + currOri + ' li' + '[data-entry= ' + pos + ']' ).addClass('clues-active');
+							util.highlightEntry(pos);
 						}
 					}
 					
 				},
 				
 				checkSolved: function(valToCheck) {
-					for (var i=0; i < solved.length; i++) {
+					for (var i=0, s=solved.length; i < s; i++) {
 						if(valToCheck === solved[i]){
 							return true;
 						}

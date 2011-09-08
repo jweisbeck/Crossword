@@ -16,7 +16,7 @@
 	/*
 		Default puzzle styling
 	*/
-	* {
+	body {
 		font: 1em/1.3em Helvetica, sans-serif;
 	}
 		table { 
@@ -29,7 +29,7 @@
 		table td {
 			width: 2em;
 			height: 2em;
-			border: 1px solid #ccc;
+			border: 1px solid #cdcdcd;
 			padding: 0;
 			margin: 0;
 			background-color: #333;
@@ -44,7 +44,7 @@
 			text-align: center;
 			font-size: 1.4em;
 			color: #666;
-			background-color: #efefef;
+			background-color: #f4f4f4;
 		}
 		
 		td input:focus {
@@ -58,14 +58,15 @@
 			top: 0;
 			left: 0;
 		}
+		
 		td.done input {
 			font-weight: bold;
 			color: #444;
-
 		}
 		
+		.active,
 		.clues-active {
-			background-color: #cbcbcb;
+			background-color: #ddd;
 		}
 		.clue-done {
 			color: #999;
