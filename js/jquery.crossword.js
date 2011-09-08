@@ -35,17 +35,17 @@
 				entries = [], 
 				rows = [],
 				cols = [],
-				topPosition = [],
+				solved = [],
 				targetProblem,
 				currVal,
 				valToCheck,
 				tabindex,
-				arrowTarget,
 				activePosition = 1,
 				clueLiEls,
 				entryInputGroup,
 				currOri,
-				currSelectedInput;
+				currSelectedInput,
+				targetInput;
 		
 		
 			var puzInit = {
@@ -72,11 +72,10 @@
 							e.keyCode === 40 ) {
 								
 							pNav.nextPrevNav(e);
-							return;	
+							return;
 						}
 												
 						puzInit.checkAnswer(e.target);
-						
 						e.preventDefault();
 					});
 					
@@ -91,7 +90,7 @@
 
 						if (e.keyCode === 9) {
 							pNav.tabNav(e);
-						}
+						}						
 
 					});
 						
@@ -176,7 +175,6 @@
 					var puzzCells = $('#puzzle td'),
 						light,
 						$groupedLights,
-						tabindex,
 						hasOffset = false,
 						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and highest POSITIONS
 						
@@ -225,14 +223,18 @@
 					- If not complete, auto-selects next input for user
 				*/
 				checkAnswer: function(light) {
+
 					
 					var light = $(light).parent(),
-					toCheck = util.getClasses(light, 'position');
-					
-					
+						toCheck = util.getClasses(light, 'position');
+										
 					for (var i=0, c = toCheck.length; i < c; ++i) {
 						targetProblem = toCheck[i].split('-')[1];
 						valToCheck = puzz.data[targetProblem-1].answer.toLowerCase();
+						
+						if(util.checkSolved(valToCheck)){
+							return false;
+						}
 						
 						currVal = $('.position-' + (targetProblem) + ' input')
 							.map(function() {								
@@ -242,19 +244,20 @@
 							})
 							.get()
 							.join('');
-							
+						
 						if(valToCheck === currVal){							
 							for (var x=0, e = entries[targetProblem-1].length; x < e; ++x) {
 
 								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
 									.addClass('done');
-
-									
+			
 								$('.active')
 									.removeClass('active');	
 
 								// grey out and strike through clue for clear visual feedback
 								$('.clues-active').addClass('clue-done');
+								
+								solved.push(valToCheck);
 
 							}
 						}
@@ -273,7 +276,8 @@
 			var pNav = {
 				
 				nextPrevNav: function(e, override) {
-										
+					$('.active').removeClass('active');
+						
 					var el, p, ps, currentPosition, sel;
 					
 					if(!override) {	
@@ -301,7 +305,7 @@
 						'.' + currentPosition[0] + ' input';
 
 					/*
-						left, right, up and down keystrokes
+						left/right/up/down keystrokes
 					*/
 					switch(e.which) {
 						case 39:
@@ -309,7 +313,8 @@
 							p
 								.next()
 								.find('input')
-								.select();
+								.select()
+								.addClass('active');
 							currOri = "across";
 							break;
 
@@ -318,7 +323,8 @@
 							p
 								.prev()
 								.find('input')
-								.select();
+								.select()
+								.addClass('active');
 							currOri = "across";
 							break;
 
@@ -327,7 +333,8 @@
 							ps
 								.next('tr')
 								.find(sel)
-								.select();
+								.select()
+								.addClass('active');
 							currOri = "down";
 							break;
 
@@ -336,7 +343,8 @@
 							ps
 								.prev('tr')
 								.find(sel)
-								.select();
+								.select()
+								.addClass('active');
 							currOri = "down";
 							break;
 
@@ -344,10 +352,9 @@
 						break;
 					}
 										
-					toHighlight = util.getClasses(el.parent(), 'position');
-					util.highlightEntry(el.parent(), currOri);
 					
-					util.selectClue(el);
+					//util.highlightEntry(el.parent());
+					util.selectClue();
 				},
 				
 				/*
@@ -383,8 +390,7 @@
 					
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
-						
-
+				
 					++activePosition;
 					e.preventDefault();
 						
@@ -398,7 +404,7 @@
 
 			
 			var util = {
-				highlightEntry: function(entry, ori) {				
+				highlightEntry: function(entry, ori) {
 					entryInputGroup = $('.entry-' + entry + ' input');
 					entryInputGroup.addClass('active');
 				},
@@ -408,6 +414,8 @@
 					- type is either 'entry' or 'position', both of which are needed at different points
 				*/
 				getClasses: function(light, type) {
+					if (!light.length) { return false };
+					
 					var classes = $(light).prop('class').split(' '),
 					classLen = classes.length,
 					positions = []; 
@@ -431,29 +439,29 @@
 					}
 				},
 				
-				selectClue: function(el) {
-					$('.clues-active').removeClass('clues-active');
-					
-					var pos = util.getClasses($(el).parent(), 'position');
-					
-					for (var i=0, p = clueLiEls.length; i < p; i++) {
-						$(clueLiEls[ pos[i].split('-')[1]-1 ]).addClass('clues-active')
+				selectClue: function() {
+					var targetInput = $('.active').parent();					
+					var pos = util.getClasses(targetInput, 'entry');
+
+					if(pos){
+						$('.clues-active').removeClass('clues-active');
+						
+						for (var i=0, p = pos.length; i < p; i++) {
+							$('ul#' + currOri + ' li' + '[data-entry= ' + pos[i].split('-')[1] + ']' ).addClass('clues-active');
+						
+						}
 					}
 					
-				}
+				},
 				
-				/*
-				selectClue: function(el, ori){
-					var entries = util.getClasses($(el).parent(), 'entry');
-					console.log(entries);
-					for (var i=0, p = entries.length; i < p; i++) {
-						
-						$('#puzzle-clues ul#' + ori + ' li[data-entry='+ entries[i].split('-')[1] +']')
-							.addClass('clues-active');
-					};
+				checkSolved: function(valToCheck) {
+					for (var i=0; i < solved.length; i++) {
+						if(valToCheck === solved[i]){
+							return true;
+						}
 
+					};
 				}
-				*/
 				
 			} // end util object
 
