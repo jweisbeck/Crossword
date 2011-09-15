@@ -83,8 +83,7 @@
 					});
 
 					clues.delegate('li', 'click', function(e) {
-						console.log(e.target);
-						pNav.clueNav(e);						
+						pNav.clickNav(e, e.target);						
 						e.preventDefault(); 
 					});
 					
@@ -92,7 +91,7 @@
 					// tab navigation handler setup
 					puzzEl.delegate('li, input', 'keydown', function(e) {
 						if (e.keyCode === 9) {
-							pNav.clueNav(e);
+							pNav.tabNav(e);
 						}						
 
 					});
@@ -361,18 +360,17 @@
 					util.highlightEntry($('.active').parent());
 					util.selectClue();
 				},
-				
+								
 				/*
 					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
 				*/
-				clueNav: function(e, goToClue) {
+				tabNav: function(e) {
 					
-					if(!goToClue){
-						activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
-						entryInputGroup ? entryInputGroup.removeClass('active') : null;
-						$('.clues-active').removeClass('clues-active');
-						$('.active').removeClass('active');
-					}
+					activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
+					entryInputGroup ? entryInputGroup.removeClass('active') : null;
+					$('.clues-active').removeClass('clues-active');
+					$('.active').removeClass('active');
+			
 					// skip past any next clues that have already been solved
 					// getSkips() sets activePosition to the next unsolved entry
 					util.getSkips(activePosition);
@@ -381,8 +379,7 @@
 					goToEntry = clueLiEls.eq(activePosition).data('entry');
 																	
 					// go back to first clue if tabbed past the end of the list
-					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? 
-					util.highlightEntry(1) : util.highlightEntry(goToEntry);						
+					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? util.highlightEntry(1) : util.highlightEntry(goToEntry);						
 					
 					
 					$(clueLiEls[activePosition])
@@ -397,13 +394,39 @@
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
 				
-					++activePosition;
+					activePosition = clueLiEls.index($('.clues-active')) +1;
 					e.preventDefault();
 						
 				},				
 			
 				clickNav: function(e) {
 					// handle clicks on clues - should have same result and ui as tab nav
+					var goToEntry = $(e.target).data('entry');
+
+					var clueIndex = clueLiEls.index($(e.target));
+					
+					entryInputGroup ? entryInputGroup.removeClass('active') : null;
+					$('.clues-active').removeClass('clues-active');
+					$('.active').removeClass('active');
+					
+					 util.highlightEntry(goToEntry);						
+					
+					$(e.target)
+						.addClass('clues-active')
+						.focus();
+					
+					
+					$('.active').eq(0).focus();
+					$('.active').eq(0).select();
+				
+					
+					// store orientation for 'smart' auto-selecting next input
+					currOri = $('.clues-active').parent('ul').prop('id');
+				
+					activePosition = activePosition >= clueLiEls.length ? 0 : clueIndex + 1;
+
+					e.preventDefault();
+					
 				}
 								
 			} // end pNav object
