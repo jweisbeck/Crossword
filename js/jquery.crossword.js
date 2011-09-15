@@ -89,11 +89,11 @@
 					
 
 					// tab navigation handler setup
-					puzzEl.delegate('li, input', 'keydown', function(e) {
+					clues.delegate('li', 'keyup', function(e) {
 						if (e.keyCode === 9) {
 							pNav.tabNav(e);
-						}						
-
+						}		
+						e.preventDefault();
 					});
 						
 					
@@ -135,7 +135,7 @@
 						}
 
 						// while we're in here, add clues to DOM!
-						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-entry="' + puzz.data[i].position + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
+						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-position="' + i + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
 					}				
 					
 					// Calculate rows/cols by finding max coords of each entry, then picking the highest
@@ -194,11 +194,9 @@
 							}
 							
 							if($(light).empty()){
-								//tabindex = 'tabindex="' + x*i +'"';
-								//tabindex = i === 0 ? 'tabindex="' + x + '"' : '';
 								tabindex = 'tabindex="-1"';
 								$(light)
-									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + x )
+									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
 									.append('<input maxlength="1" val="" type="text" ' + tabindex + ' />');
 							}
 						};
@@ -214,7 +212,7 @@
 						}
 					}	
 					
-					util.highlightEntry(1, currOri);
+					util.highlightEntry(0);
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
 										
@@ -232,7 +230,7 @@
 										
 					for (var i=0, c = toCheck.length; i < c; ++i) {
 						targetProblem = toCheck[i].split('-')[1];
-						valToCheck = puzz.data[targetProblem-1].answer.toLowerCase();
+						valToCheck = puzz.data[targetProblem].answer.toLowerCase();
 						
 						if(util.checkSolved(valToCheck)){
 							return false;
@@ -248,9 +246,9 @@
 							.join('');
 						
 						if(valToCheck === currVal){							
-							for (var x=0, e = entries[targetProblem-1].length; x < e; ++x) {
+							for (var x=0, e = entries[targetProblem].length; x < e; ++x) {
 
-								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
+								$('td[data-coords="' + entries[targetProblem][x] + '"]')
 									.addClass('done');
 			
 								$('.active')
@@ -265,7 +263,7 @@
 						}
 
 						// User not yet at last input, so auto-select next one!						
-						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOri !== ""){
+						if(entries[targetProblem].length > currVal.length && currVal !== "" && currOri !== ""){
 							currOri === 'across' ? pNav.nextPrevNav(currSelectedInput, 39) : pNav.nextPrevNav(currSelectedInput, 40);
 						}
 						
@@ -374,19 +372,16 @@
 					// skip past any next clues that have already been solved
 					// getSkips() sets activePosition to the next unsolved entry
 					util.getSkips(activePosition);
-	
-					// we're saying we want the ENTRY number of the current POSITION
-					goToEntry = clueLiEls.eq(activePosition).data('entry');
-																	
+									
+					goToEntry = $(clueLiEls[activePosition]).data('position');			
+
 					// go back to first clue if tabbed past the end of the list
-					goToEntry === clueLiEls.eq(clueLiEls.length).data('entry') ? util.highlightEntry(1) : util.highlightEntry(goToEntry);						
+					goToEntry === clueLiEls.eq(clueLiEls.length) + 1 ? util.highlightEntry(1) : util.highlightEntry(goToEntry);						
 					
-					
-					$(clueLiEls[activePosition])
+					$(clueLiEls + '[data-position=' + goToEntry + ']')
 						.addClass('clues-active')
 						.focus();
-					
-					
+									
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
 				
@@ -394,14 +389,14 @@
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
 				
-					activePosition = clueLiEls.index($('.clues-active')) +1;
+					++activePosition;
 					e.preventDefault();
 						
 				},				
 			
 				clickNav: function(e) {
 					// handle clicks on clues - should have same result and ui as tab nav
-					var goToEntry = $(e.target).data('entry');
+					var goToEntry = $(e.target).data('position');
 
 					var clueIndex = clueLiEls.index($(e.target));
 					
@@ -433,8 +428,8 @@
 
 			
 			var util = {
-				highlightEntry: function(entry) {
-					entryInputGroup = $('.entry-' + entry + ' input');
+				highlightEntry: function(position) {
+					entryInputGroup = $('.position-' + position + ' input');
 					entryInputGroup.addClass('active');
 				},
 				
