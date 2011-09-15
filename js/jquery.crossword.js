@@ -30,6 +30,8 @@
 			// initialize some variables
 			var tbl = ['<table id="puzzle">'],
 			    puzzEl = this,
+				clues = $('#puzzle-clues'),
+				clueLiEls,
 				coords,
 				entryCount = puzz.data.length,
 				entries = [], 
@@ -41,7 +43,6 @@
 				valToCheck,
 				tabindex,
 				activePosition = 1,
-				clueLiEls,
 				entryInputGroup,
 				currOri,
 				currSelectedInput,
@@ -69,8 +70,10 @@
 							e.keyCode === 37 ||
 							e.keyCode === 38 ||
 							e.keyCode === 39 ||
-							e.keyCode === 40 ) {
-								
+							e.keyCode === 40 ||
+							e.keyCode === 8 ||
+							e.keyCode === 46 ) {
+							
 							pNav.nextPrevNav(e);
 							return;
 						}
@@ -78,18 +81,18 @@
 						puzInit.checkAnswer(e.target);
 						e.preventDefault();
 					});
-					
-					puzzEl.delegate('li', 'click', function(e) {
-						pNav.clickNav(e);
+
+					clues.delegate('li', 'click', function(e) {
+						console.log(e.target);
+						pNav.clueNav(e);						
 						e.preventDefault(); 
 					});
 					
 
 					// tab navigation handler setup
-					puzzEl.delegate('li,input', 'keydown', function(e) {
-
+					puzzEl.delegate('li, input', 'keydown', function(e) {
 						if (e.keyCode === 9) {
-							pNav.tabNav(e);
+							pNav.clueNav(e);
 						}						
 
 					});
@@ -261,9 +264,9 @@
 
 							}
 						}
-						
+
+						// User not yet at last input, so auto-select next one!						
 						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOri !== ""){
-							// User not yet at last input, so auto-select next one!
 							currOri === 'across' ? pNav.nextPrevNav(currSelectedInput, 39) : pNav.nextPrevNav(currSelectedInput, 40);
 						}
 						
@@ -317,7 +320,9 @@
 								.addClass('active');
 							currOri = "across";
 							break;
-
+						
+						case 8:
+						case 46:
 						case 37:
 							// right key
 							p
@@ -360,13 +365,14 @@
 				/*
 					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
 				*/
-				tabNav: function(e) {
-
-					activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
-					entryInputGroup ? entryInputGroup.removeClass('active') : null;
-					$('.clues-active').removeClass('clues-active');
-					$('.active').removeClass('active');
+				clueNav: function(e, goToClue) {
 					
+					if(!goToClue){
+						activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
+						entryInputGroup ? entryInputGroup.removeClass('active') : null;
+						$('.clues-active').removeClass('clues-active');
+						$('.active').removeClass('active');
+					}
 					// skip past any next clues that have already been solved
 					// getSkips() sets activePosition to the next unsolved entry
 					util.getSkips(activePosition);
