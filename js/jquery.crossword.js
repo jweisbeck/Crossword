@@ -60,7 +60,7 @@
 					});
 
 					// Set keyup handlers for the 'entry' inputs that will be added presently
-					puzzEl.delegate('input', 'keyup', function(e){
+					puzzEl.delegate('input', 'keyup click', function(e){
 						// store current input so we can auto-select next one
 						currSelectedInput = $(e.target);
 						
@@ -75,7 +75,9 @@
 							e.keyCode === 46 ) {
 							
 							pNav.nextPrevNav(e);
-							return;
+
+						} else {
+							pNav.clickEntry(e);
 						}
 												
 						puzInit.checkAnswer(e.target);
@@ -277,8 +279,9 @@
 				
 				nextPrevNav: function(e, override) {
 					$('.active').removeClass('active');
-						
-					var el, p, ps, currentPosition, sel;
+					var el, p, ps, sel;
+
+					
 					
 					if(!override) {	
 						// using arrow key nav, so track native event bubble
@@ -288,7 +291,6 @@
 						e.preventDefault();
 						// user is arrowing around, no longer on tabbed-to clue, so remove visual hint
 						// a new tab strike will refocus clue highlight on tabbed-to clue
-						$('.clues-active').removeClass('clues-active');
 						
 					} else {
 						// deciding off currently selected input, so auto-select next 'light' 
@@ -299,11 +301,14 @@
 					}
 					
 					// build selector for up/down arrows												
-					currentPosition = util.getClasses(ps, 'position');
+					/*activePosition = util.getClasses(ps, 'position');
 					sel = currentPosition .length > 1 ? 
 						'.' + currentPosition[0] + ' input,.' + currentPosition[1] + ' input' :
 						'.' + currentPosition[0] + ' input';
-
+					*/
+					
+					sel = '.position-' + activePosition + ' input';
+					
 					/*
 						left/right/up/down keystrokes
 					*/
@@ -354,8 +359,9 @@
 						break;
 					}
 										
+					pNav.clickEntry(e);
 					
-					util.highlightEntry($('.active').parent());
+					util.highlightEntry(activePosition);
 					util.selectClue();
 				},
 								
@@ -379,8 +385,7 @@
 					goToEntry === clueLiEls.eq(clueLiEls.length) + 1 ? util.highlightEntry(1) : util.highlightEntry(goToEntry);						
 					
 					$(clueLiEls + '[data-position=' + goToEntry + ']')
-						.addClass('clues-active')
-						.focus();
+						.addClass('clues-active');
 									
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
@@ -398,8 +403,6 @@
 					// handle clicks on clues - should have same result and ui as tab nav
 					var goToEntry = $(e.target).data('position');
 
-					var clueIndex = clueLiEls.index($(e.target));
-					
 					entryInputGroup ? entryInputGroup.removeClass('active') : null;
 					$('.clues-active').removeClass('clues-active');
 					$('.active').removeClass('active');
@@ -417,13 +420,34 @@
 					
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
-				
-					activePosition = activePosition >= clueLiEls.length ? 0 : clueIndex + 1;
+
+					//var clueIndex = clueLiEls.index($(e.target));
+					activePosition = activePosition >= clueLiEls.length ? 0 : goToEntry + 1;
 
 					e.preventDefault();
 					
+				},
+			
+				clickEntry: function(e) {
+					var classes = util.getClasses($(e.target).parent(), 'position');
+					console.log('currOri: '+currOri);
+					if(classes.length > 1){
+						if(classes[0].split('-')[1] === currOri){
+							console.log('0');
+							activePosition = classes[0].split('-')[1];		
+						} else {
+							console.log('1');
+							activePosition = classes[1].split('-')[1];
+						}
+					} else {
+						activePosition = classes[0].split('-')[1];						
+					}
+					
+					util.selectClue();
+					$('.active').removeClass('active');
+					$('.position-' + activePosition + ' input').addClass('active');
+					
 				}
-								
 			} // end pNav object
 
 			
@@ -464,20 +488,8 @@
 				},
 				
 				selectClue: function() {
-					var targetInput = $('.active').parent();					
-					var pos,
-					 	classes = util.getClasses(targetInput, 'entry');
-
-					if(classes){
-						$('.clues-active').removeClass('clues-active');
-						
-						for (var i=0, c = classes.length; i < c; i++) {
-							pos = classes[i].split('-')[1];
-							$('ul#' + currOri + ' li' + '[data-entry= ' + pos + ']' ).addClass('clues-active');
-							util.highlightEntry(pos);
-						}
-					}
-					
+					$('.clues-active').removeClass('clues-active');
+					$(clueLiEls + '[data-position=' + activePosition + ']').addClass('clues-active');
 				},
 				
 				checkSolved: function(valToCheck) {
