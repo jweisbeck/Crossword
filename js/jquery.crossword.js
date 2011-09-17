@@ -43,11 +43,10 @@
 				valToCheck,
 				tabindex,
 				activePosition = 1,
-				entryInputGroup,
-				currOri,
 				currSelectedInput,
+				currOri,
 				targetInput,
-				entryMode;
+				mode;
 		
 		
 			var puzInit = {
@@ -64,6 +63,7 @@
 					puzzEl.delegate('input', 'keyup', function(e){
 						// store current input so we can auto-select next one
 						currSelectedInput = $(e.target);
+						mode = 'solving';
 						nav.checkEntry(e);
 						
 						if ( e.keyCode === 9) { // tabbing should always bounce back to clue lists
@@ -75,10 +75,9 @@
 							e.keyCode === 40 ||
 							e.keyCode === 8 ||
 							e.keyCode === 46 ) {
-						
-							entryMode = 'key';
+								
 							nav.nextPrevNav(e);
-							return;
+							mode = "navigating";
 						}
 												
 						e.preventDefault();
@@ -86,16 +85,16 @@
 					
 				
 					puzzEl.delegate('input', 'click', function(e) {
+						mode = 'navigating';
 						nav.checkEntry(e);
-
-						entryMode = 'clicktap';
-						puzInit.checkAnswer(e.target);
+						e.preventDefault();
 					})
 
 					
 					// click/tab clues 'navigation' handler setup
-					clues.delegate('li', 'keyup click', function(e) {
-						nav.checkNav(e);						
+					clues.delegate('li', 'click', function(e) {
+						nav.checkNav(e);
+						mode = 'navigating';					
 						e.preventDefault(); 
 					});
 					
@@ -366,10 +365,6 @@
 					
 				},
 
-				/*
-					Tab navigation moves a user through the clues <ul>s and highlights the corresponding entry in the puz table
-				*/
-
 				tabNav: function(e) {
 					
 					//activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
@@ -408,7 +403,7 @@
 				},				
 			
 				checkNav: function(e) {
-					var target, goToEntry;
+					var target;
 					
 					$('.clues-active').removeClass('clues-active');
 					$('.active').removeClass('active');
@@ -416,21 +411,18 @@
 					if (e.keyCode === 9) {
 						//goToEntry = $(clueLiEls[ $(e.target).data('position')+1 ]).data('position');
 						target = $(e.target).next();
-						goToEntry = $(target).data('position');
+						activePosition = $(target).data('position');
 					} else {
-						goToEntry = $(e.target).data('position');
 						target = e.target;
+						activePosition = $(e.target).data('position');
 					}
 					
 					console.log('target '+$(target));
-					console.log('goToEntry '+goToEntry);
+					console.log('first activePosition '+activePosition);
 					
 					
-					 util.highlightEntry(goToEntry);						
-					
-					$(target)
-						.addClass('clues-active')
-						.focus();
+					util.highlightEntry(activePosition);
+					util.selectClue();
 					
 					
 					$('.active').eq(0).focus();
@@ -438,9 +430,9 @@
 					
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
-					var currentIndex = clueLiEls.index(target);
-					var next = clueLiEls.index(clueLiEls[currentIndex+1]);
-					activePosition = activePosition >= clueLiEls.length ? 0 : next;
+					//var currentIndex = clueLiEls.index(target);
+					//var next = clueLiEls.index(clueLiEls[currentIndex+1]);
+					//activePosition = activePosition >= clueLiEls.length ? 0 : next;
 					
 					console.log('nav.checkNav() reports activePosition as: '+activePosition);	
 					
@@ -449,35 +441,41 @@
 			
 				// Sets activePosition var and adds active class to current entry
 				checkEntry: function(e) {
-			
-					var classes = util.getClasses($(e.target).parent(), 'position');
+					if(mode === "navigating"){
+						var classes = util.getClasses($(e.target).parent(), 'position');
 
-					if(classes.length > 1){
-						// get orientation for each reported position
-						var e1Ori = $(clueLiEls + '[data-position=' + classes[0].split('-')[1] + ']').parent().prop('id');
-						var e2Ori = $(clueLiEls + '[data-position=' + classes[1].split('-')[1] + ']').parent().prop('id');
+						if(classes.length > 1){
+							// get orientation for each reported position
+							var e1Ori = $(clueLiEls + '[data-position=' + classes[0].split('-')[1] + ']').parent().prop('id');
+							var e2Ori = $(clueLiEls + '[data-position=' + classes[1].split('-')[1] + ']').parent().prop('id');
 						
-						// test if clicked input is first in series. If so, and it intersects with
-						// entry of opposite orientation, switch to select this one instead
-						var e1Cell = $('.position-' + classes[0].split('-')[1] + ' input').index(e.target);
-						var e2Cell = $('.position-' + classes[1].split('-')[1] + ' input').index(e.target);
+							// test if clicked input is first in series. If so, and it intersects with
+							// entry of opposite orientation, switch to select this one instead
+							var e1Cell = $('.position-' + classes[0].split('-')[1] + ' input').index(e.target);
+							var e2Cell = $('.position-' + classes[1].split('-')[1] + ' input').index(e.target);
 												
-						currOri = e1Cell === 0 ? e1Ori : e2Ori; // change orientation if cell clicked was first in a entry of opposite direction
+							currOri = e1Cell === 0 ? e1Ori : e2Ori; // change orientation if cell clicked was first in a entry of opposite direction
 												
-						if(e1Ori === currOri){
-							activePosition = classes[0].split('-')[1];		
-						} else if(e2Ori === currOri){
-							activePosition = classes[1].split('-')[1];
+							if(e1Ori === currOri){
+								activePosition = classes[0].split('-')[1];		
+							} else if(e2Ori === currOri){
+								activePosition = classes[1].split('-')[1];
+							}
+						} else {
+							activePosition = classes[0].split('-')[1];						
 						}
-					} else {
-						activePosition = classes[0].split('-')[1];						
-					}
 					
-					util.selectClue();
-					$('.active').removeClass('active');
-					$('.position-' + activePosition + ' input').addClass('active');
+						util.selectClue();
+						util.highlightEntry(activePosition);
+						
+						
+						$('.active').removeClass('active');
+						$('.position-' + activePosition + ' input').addClass('active');
+					}	
+					// check the answer and move user to next entry cell
+					puzInit.checkAnswer(e.target);
 					
-					console.log('nav.checkEntry() reports activePosition as: '+activePosition);	
+					//console.log('nav.checkEntry() reports activePosition as: '+activePosition);	
 				}
 				
 			} // end nav object
@@ -485,8 +483,7 @@
 			
 			var util = {
 				highlightEntry: function(position) {
-					entryInputGroup = $('.position-' + position + ' input');
-					entryInputGroup.addClass('active');
+					$('.position-' + position + ' input').addClass('active');
 				},
 				
 				/*
