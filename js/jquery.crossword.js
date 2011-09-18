@@ -8,10 +8,9 @@
 			/*
 				Qurossword Puzzle: a javascript + jQuery crossword puzzle
 				"light" refers to a white box - or an input
-				"entry" refers to a single crossword problem
+
 				DEV NOTES: 
-				- ENTRY refers to the canonical problem in the puzzle, i.e. 2 down or 3 across.
-				- POSITION refers to the problem's array position in the list of problems
+				- activePosition and activeClueIndex are the primary vars that set the ui whenever there's an interaction
 				- This puzzle isn't designed to securely hide answerers. A user can see answerers in the js source
 					- An xhr provision can be added later to hit an endpoint on keyup to check the answerer
 				- The ordering of the array of problems doesn't matter. The position & orientation properties is enough information
@@ -62,8 +61,6 @@
 
 					// Set keyup handlers for the 'entry' inputs that will be added presently
 					puzzEl.delegate('input', 'keyup', function(e){
-						// store current input so we can auto-select next one
-						currSelectedInput = $(e.target);
 
 						if ( e.keyCode === 9) { // tabbing should always bounce back to clue lists
 							return false;
@@ -75,23 +72,28 @@
 							e.keyCode === 8 ||
 							e.keyCode === 46 ) {
 								
-							mode = "arrowing";
+							mode = "interacting";
 							nav.nextPrevNav(e);
 							e.preventDefault();
 							return false;
 						}
 						
 						// solving mode enacted only when user strikes a key not listed above, on an input
-						mode = 'solving';
-						//nav.checkEntry(e);
+						mode = 'interacting';
 						// check the answer and move user to next entry cell if not solved or at last input in group
-						puzInit.checkAnswer(e.target);						
+						
+						//puzInit.checkAnswer(e); // temp. disabled - bglobe puz parse doesn't provide entries metadata
+						
+						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
+						
+						
+						e.preventDefault();					
 					});
 			
 					// tab navigation handler setup
 					puzzEl.delegate('input', 'keydown', function(e) {
 						if (e.keyCode === 9) {
-							mode = "navigating";
+							mode = "setting ui";
 							nav.checkEntry(e);
 							e.preventDefault();
 							
@@ -100,7 +102,7 @@
 					
 				
 					puzzEl.delegate('input', 'click', function(e) {
-						mode = 'navigating';
+						mode = 'setting ui';
 						nav.checkEntry(e);
 						e.preventDefault();
 					})
@@ -109,7 +111,7 @@
 					// click/tab clues 'navigation' handler setup
 					clues.delegate('li', 'click', function(e) {
 						nav.checkNav(e);
-						mode = 'navigating';					
+						mode = 'setting ui';					
 						e.preventDefault(); 
 					});
 					
@@ -198,6 +200,8 @@
 						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and highest POSITIONS
 						
 					for (var x=1, p = entryCount; x <= p; ++x) {
+						var letters = puzz.data[x-1].answer.split('');
+
 						for (var i=0; i < entries[x-1].length; ++i) {
 							light = $(puzzCells +'[data-coords="' + entries[x-1][i] + '"]');
 							
@@ -211,10 +215,9 @@
 							}
 							
 							if($(light).empty()){
-								tabindex = 'tabindex="-1"';
 								$(light)
 									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
-									.append('<input maxlength="1" val="" type="text" ' + tabindex + ' />');
+									.append('<input maxlength="1" name="' + letters[x-2] + '" val="" type="text" tabindex="-1" />');
 							}
 						};
 						
@@ -240,7 +243,6 @@
 					- If not complete, auto-selects next input for user
 				*/
 				checkAnswer: function(e) {
-
 					
 					var light = $(e.target).parent(),
 						toCheck = util.getClasses(light, 'position');
@@ -275,10 +277,12 @@
 								$('.clues-active').addClass('clue-done');
 								
 								solved.push(valToCheck);
+								return;
 
 							}
 						}
-
+						
+						
 						// User not yet at last input, so auto-select next one!						
 						if(entries[targetProblem].length > currVal.length && currVal !== "" && currOri !== ""){
 							currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
@@ -295,12 +299,9 @@
 				nextPrevNav: function(e, override) {
 					$('.active').removeClass('active');
 					
-					var el, p, ps, sel;
-					
-					if(override) {	
-						e.which = override;
-					}
-					el = $(e.target),
+					if(override) e.which = override;
+
+					var el = $(e.target),
 					p = el.parent(),
 					ps = el.parents();
 					
@@ -320,13 +321,14 @@
 							break;
 					}
 					
+					// find and highlight the right group of inputs
+					// if user hits an intersection and the opposite entry happens to start here,
+					// don't change the orientation. Orientation only changes in 'setting ui' mode
 					util.getActivePositionFromClassGroup(el);
 					util.highlightEntry();
+					util.highlightClue();
 					
-					
-					//console.log(ps);
-					sel = '.position-' + activePosition + ' input';
-					console.log(activePosition);
+					selector = '.position-' + activePosition + ' input';
 					/*
 						left/right/up/down keystrokes
 					*/
@@ -338,7 +340,6 @@
 								.find('input')
 								.select()
 								.addClass('active');
-							currOri = "across";
 							break;
 						
 						case 8:
@@ -350,35 +351,30 @@
 								.find('input')
 								.select()
 								.addClass('active');
-							currOri = "across";
 							break;
 
 						case 40:
 							//down key
 							ps
 								.next('tr')
-								.find(sel)
+								.find(selector)
 								.select()
 								.addClass('active');
-							currOri = "down";
 							break;
 
 						case 38:
 						 	// up key
 							ps
 								.prev('tr')
-								.find(sel)
+								.find(selector)
 								.select()
 								.addClass('active');
-							currOri = "down";
 							break;
 
 						default:
 						break;
 					}
-					
-					//nav.checkEntry(e);
-					
+										
 				},
 
 				tabNav: function(e) {
@@ -451,9 +447,7 @@
 						
 						next = $(clueLiEls[activeClueIndex]);
 						activePosition = $(next).data('position');
-						
-						//console.log('checkEntry() tab activeClueIndex: '+activeClueIndex);
-						
+												
 					} else {
 					
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
@@ -477,7 +471,6 @@
 			
 			var util = {
 				highlightEntry: function() {
-					//console.log(activeClueIndex);
 					$('.position-' + activePosition + ' input').addClass('active');
 					$('.active').removeClass('active');	
 					$('.position-' + activePosition + ' input').addClass('active');
@@ -486,14 +479,17 @@
 				},
 				
 				highlightClue: function() {
+					var clue;
+					
 					$('.clues-active').removeClass('clues-active');
 					$(clueLiEls + '[data-position=' + activePosition + ']').addClass('clues-active');
+					
+					if (mode === 'interacting') {
+						clue = $(clueLiEls + '[data-position=' + activePosition + ']');
+						activeClueIndex = $(clueLiEls).index(clue);
+					};
 				},
 				
-				/*
-					- light refers to the parent <td> of input, where all the classes are applied
-					- type is either 'entry' or 'position', both of which are needed at different points
-				*/
 				getClasses: function(light, type) {
 					if (!light.length) { return false };
 					
@@ -542,10 +538,10 @@
 							e1Cell = $('.position-' + classes[0].split('-')[1] + ' input').index(el);
 							e2Cell = $('.position-' + classes[1].split('-')[1] + ' input').index(el);
 							
-							if(mode !== "arrowing"){
+							if(mode !== "interacting"){
 								currOri = e1Cell === 0 ? e1Ori : e2Ori; // change orientation if cell clicked was first in a entry of opposite direction
 							}
-							
+
 							if(e1Ori === currOri){
 								activePosition = classes[0].split('-')[1];		
 							} else if(e2Ori === currOri){
