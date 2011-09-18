@@ -91,8 +91,8 @@
 					});
 			
 					// tab navigation handler setup
-					puzzEl.delegate('input', 'keydown', function(e) {
-						if (e.keyCode === 9) {
+					puzzEl.delegate('input', 'keydown click', function(e) {
+						if (e.keyCode === 9 || !e.keyCode) {
 							console.log(currOri);
 							mode = "setting ui";
 							nav.checkEntry(e);
@@ -101,13 +101,6 @@
 						}						
 					});
 					
-				
-					puzzEl.delegate('input', 'click', function(e) {
-						mode = 'setting ui';
-						nav.checkEntry(e);
-						e.preventDefault();
-					})
-
 					
 					// click/tab clues 'navigation' handler setup
 					clues.delegate('li', 'click', function(e) {
