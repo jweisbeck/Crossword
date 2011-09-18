@@ -61,6 +61,7 @@
 
 					// Set keyup handlers for the 'entry' inputs that will be added presently
 					puzzEl.delegate('input', 'keyup', function(e){
+						mode = 'interacting';
 
 						if ( e.keyCode === 9) { // tabbing should always bounce back to clue lists
 							return false;
@@ -72,20 +73,16 @@
 							e.keyCode === 8 ||
 							e.keyCode === 46 ) {
 								
-							mode = "interacting";
 							nav.nextPrevNav(e);
 							e.preventDefault();
 							return false;
 						}
 						
-						// solving mode enacted only when user strikes a key not listed above, on an input
-						mode = 'interacting';
 						// check the answer and move user to next entry cell if not solved or at last input in group
 						
 						//puzInit.checkAnswer(e); // temp. disabled - bglobe puz parse doesn't provide entries metadata
 						
 						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
-						
 						
 						e.preventDefault();					
 					});
@@ -99,14 +96,6 @@
 							e.preventDefault();
 							
 						}						
-					});
-					
-					
-					// click/tab clues 'navigation' handler setup
-					clues.delegate('li', 'click', function(e) {
-						nav.checkNav(e);
-						mode = 'setting ui';					
-						e.preventDefault(); 
 					});
 					
 					
