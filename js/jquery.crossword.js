@@ -47,7 +47,7 @@
 				currOri,
 				targetInput,
 				mode;
-		
+
 		
 			var puzInit = {
 				
@@ -90,12 +90,20 @@
 					// tab navigation handler setup
 					puzzEl.delegate('input', 'keydown click', function(e) {
 						if (e.keyCode === 9 || !e.keyCode) {
-							console.log(currOri);
+							//console.log(currOri);
 							mode = "setting ui";
 							nav.checkEntry(e);
 							e.preventDefault();
 							
 						}						
+					});
+					
+					
+					// click/tab clues 'navigation' handler setup
+					clues.delegate('li', 'click', function(e) {
+						nav.checkNav(e);
+						mode = 'setting ui';					
+						e.preventDefault(); 
 					});
 					
 					
@@ -216,6 +224,7 @@
 					}	
 					
 					util.highlightEntry();
+					util.highlightClue();
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
 										
@@ -258,13 +267,12 @@
 
 								// grey out and strike through clue for clear visual feedback
 								$('.clues-active').addClass('clue-done');
-								
+							
 								solved.push(valToCheck);
 								return;
 
 							}
 						}
-						
 						
 						// User not yet at last input, so auto-select next one!						
 						if(entries[targetProblem].length > currVal.length && currVal !== "" && currOri !== ""){
@@ -362,18 +370,10 @@
 				},
 
 				tabNav: function(e) {
-					//activePosition = activePosition >= clueLiEls.length ? 0 : activePosition;
-					//entryInputGroup ? entryInputGroup.removeClass('active') : null;
 					$('.clues-active').removeClass('clues-active');
 					$('.active').removeClass('active');
 
-
-									
-					// go back to first clue if tabbed past the end of the list
-					//goToEntry === clueLiEls.eq(clueLiEls.length) + 1 ? util.highlightEntry(1) : util.highlightEntry(goToEntry);						
-					//var goToEntry = $(e.target).data('position') + 1;
-					//$(clueLiEls + '[data-position=' + goToEntry + ']').addClass('clues-active');
-					console.log($(e.target).parent());
+					//console.log($(e.target).parent());
 					activePosition = $(e.target).parent().data('position');
 					
 					util.getSkips(activePosition);
@@ -389,7 +389,7 @@
 					var next = clueLiEls.index(clueLiEls[currentIndex+1]);
 					activePosition = activePosition >= clueLiEls.length ? 0 : next;
 
-					console.log('nav.tavNav() reports activePosition as: '+activePosition);	
+					//console.log('nav.tavNav() reports activePosition as: '+activePosition);	
 											
 				},				
 			
@@ -412,7 +412,7 @@
 					currOri = $('.clues-active').parent('ul').prop('id');
 										
 					activeClueIndex = $(clueLiEls).index(e.target);
-					console.log('checkNav() activeClueIndex: '+activeClueIndex);
+					//console.log('checkNav() activeClueIndex: '+activeClueIndex);
 					
 				},
 			
@@ -421,8 +421,7 @@
 					var classes, next, clue, e1Ori, e2Ori, e1Cell, e2Cell;
 					
 					if(e.keyCode === 9){
-						// handle tabbing through problems, which keys off clues and requires different handling
-						
+						// handle tabbing through problems, which keys off clues and requires different handling		
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
 					
 						$('.clues-active').removeClass('.clues-active');
@@ -445,10 +444,8 @@
 					}
 						
 						util.highlightEntry();
-						util.highlightClue();
-
-					
-					//console.log('nav.checkEntry() reports activePosition as: '+activePosition);	
+						util.highlightClue();	
+						//console.log('nav.checkEntry() reports activePosition as: '+activePosition);	
 				}
 				
 			} // end nav object
