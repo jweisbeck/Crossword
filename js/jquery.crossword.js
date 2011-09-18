@@ -93,6 +93,7 @@
 					// tab navigation handler setup
 					puzzEl.delegate('input', 'keydown', function(e) {
 						if (e.keyCode === 9) {
+							console.log(currOri);
 							mode = "setting ui";
 							nav.checkEntry(e);
 							e.preventDefault();
@@ -297,6 +298,7 @@
 			var nav = {
 				
 				nextPrevNav: function(e, override) {
+					//console.log(currOri);
 					$('.active').removeClass('active');
 					
 					if(override) e.which = override;
@@ -446,6 +448,7 @@
 						util.getSkips();
 						
 						next = $(clueLiEls[activeClueIndex]);
+						currOri = next.parent().prop('id');
 						activePosition = $(next).data('position');
 												
 					} else {
