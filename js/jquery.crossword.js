@@ -102,6 +102,7 @@
 							return false;
 						}
 								
+/*
 						// if at the last input of the current entry, jump to next entry/clue		
 						if ((currIndex+1) === $actives.length) {
 
@@ -117,10 +118,13 @@
 							currIndex = 0;
 							return false;	
 
-						}
-												
+						}*/
+
+						
+						puzInit.checkAnswer($(e.target));
+											
 						// If input is a valid letter guess, auto-move input to next appropriate input in entry
-						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40); 
+						//currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40); 
 						e.preventDefault();
 						return false;					
 					});
@@ -274,51 +278,55 @@
 					- If not complete, auto-selects next input for user
 				*/
 				checkAnswer: function(light) {
-	
 					var light = $(light).parent(),
 						toCheck = util.getClasses(light, 'position');
-										
+
 					for (var i=0, c = toCheck.length; i < c; ++i) {
 						targetProblem = toCheck[i].split('-')[1];
-						valToCheck = puzz.data[targetProblem-1].answer.toLowerCase();
-						
+						valToCheck = puzz.data[targetProblem].answer.toLowerCase();
+
 						if(util.checkSolved(valToCheck)){
 							return false;
 						}
-						
+
 						currVal = $('.position-' + (targetProblem) + ' input')
-							.map(function() {								
+							.map(function() {
 						  		return $(this)
 									.val()
 									.toLowerCase();
 							})
 							.get()
 							.join('');
-						
-						if(valToCheck === currVal){							
-							for (var x=0, e = entries[targetProblem-1].length; x < e; ++x) {
 
-								$('td[data-coords="' + entries[targetProblem-1][x] + '"]')
+						if(valToCheck === currVal){	
+
+							for (var x=0, e = entries[targetProblem].length; x < e; ++x) {
+
+								$('td[data-coords="' + entries[targetProblem][x] + '"]')
 									.addClass('done');
-			
+
 								$('.active')
 									.removeClass('active');	
 
 								// grey out and strike through clue for clear visual feedback
 								$('.clues-active').addClass('clue-done');
-								
+
 								solved.push(valToCheck);
 
 							}
-						}
-						
+						}	
+
+						/*
+						// moved to event handler - might move back here!
 						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOri !== ""){
 							// User not yet at last input, so auto-select next one!
 							currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
 						}
-						
+						*/
+
 					};
-				
+				}				
+
 				
 			}; // end puzInit object
 			
@@ -546,6 +554,15 @@
 						} else {
 							activePosition = classes[0].split('-')[1];						
 						}
+				},
+				
+				checkSolved: function(valToCheck) {
+					for (var i=0, s=solved.length; i < s; i++) {
+						if(valToCheck === solved[i]){
+							return true;
+						}
+
+					}
 				}
 				
 			}; // end util object
