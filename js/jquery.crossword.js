@@ -38,18 +38,15 @@
 				rows = [],
 				cols = [],
 				solved = [],
-				targetProblem,
-				currVal,
-				valToCheck,
 				tabindex,
 				$actives,
 				activePosition = 0,
 				activeClueIndex = 0,
 				currOri,
 				targetInput,
-				mode,
-				current,
-				currIndex = 0;
+				mode = 'interacting',
+				solvedToggle = false,
+				z = 0;
 
 			var puzInit = {
 				
@@ -64,8 +61,7 @@
 					// Set keyup handlers for the 'entry' inputs that will be added presently
 					puzzEl.delegate('input', 'keyup', function(e){
 						mode = 'interacting';
-						//console.log(currIndex);
-
+						
 						if ( e.keyCode === 9) {
 							return false;
 						} else if (
@@ -96,35 +92,19 @@
 							} else {
 								nav.nextPrevNav(e);
 							}
-
 							
 							e.preventDefault();
 							return false;
+						} else {
+							
+							puzInit.checkAnswer(e);
+
+							if(!solvedToggle){
+								// User not yet at last input, so auto-select next one!
+								currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
+							}
 						}
-								
-/*
-						// if at the last input of the current entry, jump to next entry/clue		
-						if ((currIndex+1) === $actives.length) {
 
-							if( e.keyCode === 9 ||
-								e.keyCode === 8 ||
-								e.keyCode === 46) {
-									return false;
-								}
-
-							mode = "setting ui";
-							$('.current').removeClass('current');
-							nav.updateByEntry(e, true);
-							currIndex = 0;
-							return false;	
-
-						}*/
-
-						
-						puzInit.checkAnswer($(e.target));
-											
-						// If input is a valid letter guess, auto-move input to next appropriate input in entry
-						//currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40); 
 						e.preventDefault();
 						return false;					
 					});
@@ -132,13 +112,13 @@
 					// tab navigation handler setup
 					puzzEl.delegate('input', 'keydown click', function(e) {
 						mode = "setting ui";
-						if (e.keyCode === 9) {
-							nav.updateByNav(e);
-							
-						} else if(!e.keyCode){
+
+						if ( e.keyCode === 9 || !e.keyCode) {
 							nav.updateByEntry(e);
-						}			
-						
+						} else {
+							return true;
+						}
+												
 						e.preventDefault();
 									
 					});
@@ -146,8 +126,10 @@
 					
 					// click/tab clues 'navigation' handler setup
 					clues.delegate('li', 'click', function(e) {
-						mode = 'setting ui';					
-						nav.updateByNav(e);
+						mode = 'setting ui';				
+						if (!e.keyCode) {
+							nav.updateByNav(e);
+						} 
 						e.preventDefault(); 
 					});
 					
@@ -204,7 +186,7 @@
 
 					rows = Math.max.apply(Math, rows) + "";
 					cols = Math.max.apply(Math, cols) + "";
-					
+		
 				},
 				
 				/*
@@ -281,57 +263,43 @@
 					- Checks current entry input group value against answer
 					- If not complete, auto-selects next input for user
 				*/
-				checkAnswer: function(light) {
-					var light = $(light).parent(),
-						toCheck = util.getClasses(light, 'position');
-
-					for (var i=0, c = toCheck.length; i < c; ++i) {
-						targetProblem = toCheck[i].split('-')[1];
-						valToCheck = puzz.data[targetProblem].answer.toLowerCase();
-
-						if(util.checkSolved(valToCheck)){
-							return false;
-						}
-
-						currVal = $('.position-' + (targetProblem) + ' input')
-							.map(function() {
-						  		return $(this)
-									.val()
-									.toLowerCase();
-							})
-							.get()
-							.join('');
-
-						if(valToCheck === currVal){	
-
-							for (var x=0, e = entries[targetProblem].length; x < e; ++x) {
-
-								$('td[data-coords="' + entries[targetProblem][x] + '"]')
-									.addClass('done');
-
-								$('.active')
-									.removeClass('active');	
-
-								// grey out and strike through clue for clear visual feedback
-								$('.clues-active').addClass('clue-done');
-
-								solved.push(valToCheck);
-
-							}
-						}	
-
-						/*
-						// moved to event handler - might move back here!
-						if(entries[targetProblem-1].length > currVal.length && currVal !== "" && currOri !== ""){
-							// User not yet at last input, so auto-select next one!
-							currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
-						}
-						*/
-
+				checkAnswer: function(e) {
+					if (solvedToggle) {
+						solvedToggle = false;
 					};
+					
+					var valToCheck, currVal;
+					
+					util.getActivePositionFromClassGroup($(e.target));
+				
+					valToCheck = puzz.data[activePosition].answer.toLowerCase();
+
+					currVal = $('.position-' + activePosition + ' input')
+						.map(function() {
+					  		return $(this)
+								.val()
+								.toLowerCase();
+						})
+						.get()
+						.join('');
+					
+				
+					if(valToCheck === currVal){	
+						$('.active')
+							.addClass('done')
+							.removeClass('active');
+					
+						$('.clues-active').addClass('clue-done');
+
+						solved.push(valToCheck);
+						solvedToggle = true;
+					}
+					//z++;
+					//console.log(z);
+
 				}				
 
-				
+
 			}; // end puzInit object
 			
 
@@ -352,7 +320,6 @@
 					
 					$('.current').removeClass('current');
 					
-					
 					selector = '.position-' + activePosition + ' input';
 										
 					// move input focus/select to 'next' input
@@ -361,36 +328,40 @@
 							p
 								.next()
 								.find('input')
-								.addClass('current');
-							util.trackCurrent();
-							$('.current').select();
+								.addClass('current')
+								.select();
+							//util.getCurrent();
+							//$('.current').select();
 							break;
 						
 						case 37:
 							p
 								.prev()
 								.find('input')
-								.addClass('current');
-							util.trackCurrent();
-							$('.current').select();
+								.addClass('current')
+								.select();
+							//util.getCurrent();
+							//$('.current').select();
 							break;
 
 						case 40:
 							ps
 								.next('tr')
 								.find(selector)
-								.addClass('current');
-							util.trackCurrent();
-							$('.current').select();
+								.addClass('current')
+								.select();
+							//util.getCurrent();
+							//$('.current').select();
 							break;
 
 						case 38:
 							ps
 								.prev('tr')
 								.find(selector)
-								.addClass('current');
-							util.trackCurrent();
-							$('.current').select();
+								.addClass('current')
+								.select();
+							//util.getCurrent();
+							//$('.current').select();
 							break;
 
 						default:
@@ -398,37 +369,7 @@
 					}
 															
 				},
-
-				tabNav: function(e) {
-					$('.clues-active').removeClass('clues-active');
-					$('.active').removeClass('active');
-					$('.current').removeClass('current');
-					currIndex = 0;
-					
-					
-
-					//console.log($(e.target).parent());
-					activePosition = $(e.target).parent().data('position');
-
-					util.getSkips(activePosition);
-					util.highlightEntry();
-					util.highlightClue();
-									
-					$('.active').eq(0).focus();
-					$('.active').eq(0).select();
-					$('.current').removeClass('current');
-					
-				
-					// store orientation for 'smart' auto-selecting next input
-					currOri = $('.clues-active').parent('ul').prop('id');
-					var currentIndex = clueLiEls.index(e.target);
-					var next = clueLiEls.index(clueLiEls[currentIndex+1]);
-					activePosition = activePosition >= clueLiEls.length ? 0 : next;
-
-					console.log('nav.tavNav() reports activePosition as: '+activePosition);	
-											
-				},				
-			
+	
 				updateByNav: function(e) {
 					var target;
 					
@@ -459,6 +400,9 @@
 				updateByEntry: function(e, next) {
 					var classes, next, clue, e1Ori, e2Ori, e1Cell, e2Cell;
 					
+					//$('.current').removeClass('current');
+					//currIndex = 0;
+					
 					if(e.keyCode === 9 || next){
 						// handle tabbing through problems, which keys off clues and requires different handling		
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
@@ -468,7 +412,12 @@
 						next = $(clueLiEls[activeClueIndex]);
 						currOri = next.parent().prop('id');
 						activePosition = $(next).data('position');
-																		
+												
+						// skips over already-solved problems
+						util.getSkips(activeClueIndex);
+						activePosition = $(clueLiEls[activeClueIndex]).data('position');
+						
+																								
 					} else {
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
 					
@@ -481,8 +430,8 @@
 						
 						util.highlightEntry();
 						util.highlightClue();
-						$actives.eq(0).addClass('current');
-							
+						
+						//$actives.eq(0).addClass('current');	
 						//console.log('nav.updateByEntry() reports activePosition as: '+activePosition);	
 				}
 				
@@ -498,11 +447,6 @@
 					$actives = $('.position-' + activePosition + ' input').addClass('active');
 					$actives.eq(0).focus();
 					$actives.eq(0).select();
-							
-				},
-				
-				trackCurrent: function() {
-					currIndex = $($actives).index($('.current'));
 				},
 				
 				highlightClue: function() {
@@ -561,6 +505,7 @@
 				},
 				
 				checkSolved: function(valToCheck) {
+					console.log('hi');
 					for (var i=0, s=solved.length; i < s; i++) {
 						if(valToCheck === solved[i]){
 							return true;
@@ -571,8 +516,8 @@
 				
 				getSkips: function(position) {
 					if ($(clueLiEls[position]).hasClass('clue-done')){
-						activePosition = position >= clueLiEls.length ? 0 : ++activePosition;
-						util.getSkips(activePosition);						
+						activeClueIndex = position >= activeClueIndex.length ? 0 : ++activeClueIndex;
+						util.getSkips(activeClueIndex);						
 					} else {
 						return false;
 					}
