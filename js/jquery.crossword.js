@@ -64,6 +64,7 @@
 					// Set keyup handlers for the 'entry' inputs that will be added presently
 					puzzEl.delegate('input', 'keyup', function(e){
 						mode = 'interacting';
+						//console.log(currIndex);
 
 						if ( e.keyCode === 9) {
 							return false;
@@ -103,8 +104,6 @@
 								
 						// if at the last input of the current entry, jump to next entry/clue		
 						if ((currIndex+1) === $actives.length) {
-
-							console.log(e.keyCode);
 
 							if( e.keyCode === 9 ||
 								e.keyCode === 8 ||
@@ -340,6 +339,10 @@
 				tabNav: function(e) {
 					$('.clues-active').removeClass('clues-active');
 					$('.active').removeClass('active');
+					$('.current').removeClass('current');
+					currIndex = 0;
+					
+					
 
 					//console.log($(e.target).parent());
 					activePosition = $(e.target).parent().data('position');
@@ -350,6 +353,8 @@
 									
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
+					$('.current').removeClass('current');
+					
 				
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
@@ -367,6 +372,7 @@
 					$('.clues-active').removeClass('clues-active');
 					$('.active').removeClass('active');
 					$('.current').removeClass('current');
+					currIndex = 0;
 
 					target = e.target;
 					activePosition = $(e.target).data('position');
