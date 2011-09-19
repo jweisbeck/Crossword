@@ -114,7 +114,7 @@
 
 							mode = "setting ui";
 							$('.current').removeClass('current');
-							nav.checkEntry(e, true);
+							nav.updateByEntry(e, true);
 							currIndex = 0;
 							return false;	
 
@@ -131,19 +131,23 @@
 			
 					// tab navigation handler setup
 					puzzEl.delegate('input', 'keydown click', function(e) {
-						if (e.keyCode === 9 || !e.keyCode) {
-							//console.log(currOri);
-							mode = "setting ui";
-							nav.checkEntry(e);
-							e.preventDefault();
-						}						
+						mode = "setting ui";
+						if (e.keyCode === 9) {
+							nav.updateByNav(e);
+							
+						} else if(!e.keyCode){
+							nav.updateByEntry(e);
+						}			
+						
+						e.preventDefault();
+									
 					});
 					
 					
 					// click/tab clues 'navigation' handler setup
 					clues.delegate('li', 'click', function(e) {
 						mode = 'setting ui';					
-						nav.checkNav(e);
+						nav.updateByNav(e);
 						e.preventDefault(); 
 					});
 					
@@ -405,7 +409,7 @@
 
 					//console.log($(e.target).parent());
 					activePosition = $(e.target).parent().data('position');
-					
+
 					util.getSkips(activePosition);
 					util.highlightEntry();
 					util.highlightClue();
@@ -421,11 +425,11 @@
 					var next = clueLiEls.index(clueLiEls[currentIndex+1]);
 					activePosition = activePosition >= clueLiEls.length ? 0 : next;
 
-					//console.log('nav.tavNav() reports activePosition as: '+activePosition);	
+					console.log('nav.tavNav() reports activePosition as: '+activePosition);	
 											
 				},				
 			
-				checkNav: function(e) {
+				updateByNav: function(e) {
 					var target;
 					
 					$('.clues-active').removeClass('clues-active');
@@ -447,12 +451,12 @@
 					currOri = $('.clues-active').parent('ul').prop('id');
 										
 					activeClueIndex = $(clueLiEls).index(e.target);
-					//console.log('checkNav() activeClueIndex: '+activeClueIndex);
+					//console.log('updateByNav() activeClueIndex: '+activeClueIndex);
 					
 				},
 			
 				// Sets activePosition var and adds active class to current entry
-				checkEntry: function(e, next) {
+				updateByEntry: function(e, next) {
 					var classes, next, clue, e1Ori, e2Ori, e1Cell, e2Cell;
 					
 					if(e.keyCode === 9 || next){
@@ -464,7 +468,7 @@
 						next = $(clueLiEls[activeClueIndex]);
 						currOri = next.parent().prop('id');
 						activePosition = $(next).data('position');
-												
+																		
 					} else {
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
 					
@@ -472,14 +476,14 @@
 						
 						clue = $(clueLiEls + '[data-position=' + activePosition + ']');
 						activeClueIndex = $(clueLiEls).index(clue);
-						//console.log('checkEntry() not tab activeClueIndex: '+activeClueIndex);
+						//console.log('updateByEntry() not tab activeClueIndex: '+activeClueIndex);
 					}
 						
 						util.highlightEntry();
 						util.highlightClue();
 						$actives.eq(0).addClass('current');
 							
-						//console.log('nav.checkEntry() reports activePosition as: '+activePosition);	
+						//console.log('nav.updateByEntry() reports activePosition as: '+activePosition);	
 				}
 				
 			}; // end nav object
@@ -562,6 +566,15 @@
 							return true;
 						}
 
+					}
+				},
+				
+				getSkips: function(position) {
+					if ($(clueLiEls[position]).hasClass('clue-done')){
+						activePosition = position >= clueLiEls.length ? 0 : ++activePosition;
+						util.getSkips(activePosition);						
+					} else {
+						return false;
 					}
 				}
 				
