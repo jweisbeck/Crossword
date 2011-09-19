@@ -65,20 +65,6 @@
 					puzzEl.delegate('input', 'keyup', function(e){
 						mode = 'interacting';
 
-						// if at the last input of the current entry, jump to next entry/clue		
-						if ((currIndex+1) === $actives.length) {
-							console.log(e.keyCode);
-							if( e.keyCode !== 8 ||
-								e.keyCode !== 46) {
-							mode = "setting ui";
-							$('.current').removeClass('current');
-							nav.checkEntry(e, true);
-							currIndex = 0;
-							return false;	
-							}
-						}		
-						//console.log(currIndex);
-
 						if ( e.keyCode === 9) {
 							return false;
 						} else if (
@@ -88,6 +74,7 @@
 							e.keyCode === 40 ||
 							e.keyCode === 8 ||
 							e.keyCode === 46 ) {			
+												
 											
 							// need to figure out orientation up front, before we attempt to highlight an entry
 							switch(e.which) {
@@ -113,10 +100,30 @@
 							e.preventDefault();
 							return false;
 						}
-															
+								
+						// if at the last input of the current entry, jump to next entry/clue		
+						if ((currIndex+1) === $actives.length) {
+
+							console.log(e.keyCode);
+
+							if( e.keyCode === 9 ||
+								e.keyCode === 8 ||
+								e.keyCode === 46) {
+									return false;
+								}
+
+							mode = "setting ui";
+							$('.current').removeClass('current');
+							nav.checkEntry(e, true);
+							currIndex = 0;
+							return false;	
+
+						}
+												
 						// If input is a valid letter guess, auto-move input to next appropriate input in entry
 						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40); 
-						e.preventDefault();					
+						e.preventDefault();
+						return false;					
 					});
 			
 					// tab navigation handler setup
@@ -359,6 +366,7 @@
 					
 					$('.clues-active').removeClass('clues-active');
 					$('.active').removeClass('active');
+					$('.current').removeClass('current');
 
 					target = e.target;
 					activePosition = $(e.target).data('position');
@@ -368,6 +376,7 @@
 										
 					$('.active').eq(0).focus();
 					$('.active').eq(0).select();
+					$('.active').eq(0).addClass('current');
 					
 					// store orientation for 'smart' auto-selecting next input
 					currOri = $('.clues-active').parent('ul').prop('id');
