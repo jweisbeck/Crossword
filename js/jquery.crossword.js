@@ -11,7 +11,7 @@
 
 				DEV NOTES: 
 				- activePosition and activeClueIndex are the primary vars that set the ui whenever there's an interaction
-				- 'Entry' is a puzzle term used to describe the group of letter inputs representing a word solution
+				- 'Entry' is a puzzler term used to describe the group of letter inputs representing a word solution
 				- This puzzle isn't designed to securely hide answerers. A user can see answerers in the js source
 					- An xhr provision can be added later to hit an endpoint on keyup to check the answerer
 				- The ordering of the array of problems doesn't matter. The position & orientation properties is enough information
@@ -42,14 +42,15 @@
 				currVal,
 				valToCheck,
 				tabindex,
+				$actives,
 				activePosition = 0,
 				activeClueIndex = 0,
-				currSelectedInput,
 				currOri,
 				targetInput,
-				mode;
+				mode,
+				current,
+				currIndex;
 
-		
 			var puzInit = {
 				
 				init: function() {
@@ -64,7 +65,7 @@
 					puzzEl.delegate('input', 'keyup', function(e){
 						mode = 'interacting';
 
-						if ( e.keyCode === 9) { // tabbing should always bounce back to clue lists
+						if ( e.keyCode === 9) {
 							return false;
 						} else if (
 							e.keyCode === 37 ||
@@ -75,7 +76,13 @@
 							e.keyCode === 46 ) {
 									
 							//nav.nextPrevNav(e);
-														
+							
+							// if at the last input of the current entry, don't skip back to first input, stay put		
+							if ((currIndex-1) === $actives.length) {
+								nav.checkEntry(e);
+							}		
+							$('.current').removeClass('current');			
+											
 							// need to figure out orientation up front, before we attempt to highlight an entry
 							switch(e.which) {
 								case 39:
@@ -303,26 +310,26 @@
 					};
 				}
 								
-			} // end puzInit object
+			}; // end puzInit object
 			
 
 			var nav = {
 				
 				nextPrevNav: function(e, override) {
-					var struck = override ? override : e.which;
 
-					//console.log(currOri);
-					$('.active').removeClass('active');
-										
-					var el = $(e.target),
-					p = el.parent(),
-					ps = el.parents();
-
+					var len = $actives.length,
+						struck = override ? override : e.which,
+						el = $(e.target),
+						p = el.parent(),
+						ps = el.parents(),
+						selector;
+				
 					util.getActivePositionFromClassGroup(el);
 					util.highlightEntry();
 					util.highlightClue();
 					
 					selector = '.position-' + activePosition + ' input';
+					
 					
 					// move input focus/select to 'next' input
 					switch(struck) {
@@ -330,38 +337,42 @@
 							p
 								.next()
 								.find('input')
-								.select()
-								.addClass('active');
+								.addClass('current');
+							util.trackCurrent();
+							$('.current').select();
 							break;
 						
 						case 37:
 							p
 								.prev()
 								.find('input')
-								.select()
-								.addClass('active');
+								.addClass('current');
+							util.trackCurrent();
+							$('.current').select();
 							break;
 
 						case 40:
 							ps
 								.next('tr')
 								.find(selector)
-								.select()
-								.addClass('active');
+								.addClass('current');
+							util.trackCurrent();
+							$('.current').select();
 							break;
 
 						case 38:
 							ps
 								.prev('tr')
 								.find(selector)
-								.select()
-								.addClass('active');
+								.addClass('current');
+							util.trackCurrent();
+							$('.current').select();
 							break;
 
 						default:
 						break;
 					}
-										
+															
 				},
 
 				tabNav: function(e) {
@@ -428,7 +439,7 @@
 						activePosition = $(next).data('position');
 												
 					} else {
-					
+					console.log(e.target);
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
 					
 						util.getActivePositionFromClassGroup(e.target);
@@ -443,16 +454,29 @@
 						//console.log('nav.checkEntry() reports activePosition as: '+activePosition);	
 				}
 				
-			} // end nav object
+			}; // end nav object
 
 			
 			var util = {
-				highlightEntry: function() {
-					$('.position-' + activePosition + ' input').addClass('active');
-					$('.active').removeClass('active');	
-					$('.position-' + activePosition + ' input').addClass('active');
-					$('.active').eq(0).focus();
-					$('.active').eq(0).select();
+				highlightEntry: function() {						
+					// this routine needs to be smarter because it doesn't need to fire every time, only
+					// when activePosition changes
+					$actives = $('.active');
+					$actives.removeClass('active');
+					$actives = $('.position-' + activePosition + ' input').addClass('active');
+					$actives.eq(0).focus();
+					$actives.eq(0).select();
+							
+				},
+				
+				trackCurrent: function() {
+					current = $('.current');
+										
+					currIndex = $($actives).index($('.current'));
+					
+					console.log( currIndex+1 );
+					console.log($actives.length);
+
 				},
 				
 				highlightClue: function() {
@@ -468,7 +492,7 @@
 				},
 				
 				getClasses: function(light, type) {
-					if (!light.length) { return false };
+					if (!light.length) return false;
 					
 					var classes = $(light).prop('class').split(' '),
 					classLen = classes.length,
@@ -529,7 +553,7 @@
 						}
 				}
 				
-			} // end util object
+			}; // end util object
 
 				
 			puzInit.init();
