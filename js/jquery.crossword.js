@@ -11,6 +11,7 @@
 
 				DEV NOTES: 
 				- activePosition and activeClueIndex are the primary vars that set the ui whenever there's an interaction
+				- 'Entry' is a puzzle term used to describe the group of letter inputs representing a word solution
 				- This puzzle isn't designed to securely hide answerers. A user can see answerers in the js source
 					- An xhr provision can be added later to hit an endpoint on keyup to check the answerer
 				- The ordering of the array of problems doesn't matter. The position & orientation properties is enough information
@@ -72,18 +73,38 @@
 							e.keyCode === 40 ||
 							e.keyCode === 8 ||
 							e.keyCode === 46 ) {
-								
-							nav.nextPrevNav(e);
+									
+							//nav.nextPrevNav(e);
+														
+							// need to figure out orientation up front, before we attempt to highlight an entry
+							switch(e.which) {
+								case 39:
+								case 37:
+									currOri = 'across';
+									break;
+								case 38:
+								case 40:
+									currOri = 'down';
+									break;
+								default:
+									break;
+							}
+							
+							if (e.keyCode === 8 || e.keyCode === 46) {
+								currOri === 'across' ? nav.nextPrevNav(e, 37) : nav.nextPrevNav(e, 38); 
+							} else {
+								nav.nextPrevNav(e);
+							}
+
+							
 							e.preventDefault();
 							return false;
 						}
-						
-						// check the answer and move user to next entry cell if not solved or at last input in group
-						
+									
 						//puzInit.checkAnswer(e); // temp. disabled - bglobe puz parse doesn't provide entries metadata
 						
-						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
-						
+						// If input is a valid letter guess, auto-move input to next appropriate input in entry
+						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40); 
 						e.preventDefault();					
 					});
 			
@@ -208,7 +229,7 @@
 							if($(light).empty()){
 								$(light)
 									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
-									.append('<input maxlength="1" name="' + letters[x-2] + '" val="" type="text" tabindex="-1" />');
+									.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
 							}
 						};
 						
@@ -288,45 +309,24 @@
 			var nav = {
 				
 				nextPrevNav: function(e, override) {
+					var struck = override ? override : e.which;
+
 					//console.log(currOri);
 					$('.active').removeClass('active');
-					
-					if(override) e.which = override;
-
+										
 					var el = $(e.target),
 					p = el.parent(),
 					ps = el.parents();
-					
-					// need to figure out orientation up front, before we attempt to highlight an entry
-					switch(e.which) {
-						case 39:
-						case 8:
-						case 46:
-						case 37:
-							currOri = 'across';
-							break;
-						case 38:
-						case 40:
-							currOri = 'down';
-							break;
-						default:
-							break;
-					}
-					
-					// find and highlight the right group of inputs
-					// if user hits an intersection and the opposite entry happens to start here,
-					// don't change the orientation. Orientation only changes in 'setting ui' mode
+
 					util.getActivePositionFromClassGroup(el);
 					util.highlightEntry();
 					util.highlightClue();
 					
 					selector = '.position-' + activePosition + ' input';
-					/*
-						left/right/up/down keystrokes
-					*/
-					switch(e.which) {
+					
+					// move input focus/select to 'next' input
+					switch(struck) {
 						case 39:
-							// left key
 							p
 								.next()
 								.find('input')
@@ -334,10 +334,7 @@
 								.addClass('active');
 							break;
 						
-						case 8:
-						case 46:
 						case 37:
-							// right key
 							p
 								.prev()
 								.find('input')
@@ -346,7 +343,6 @@
 							break;
 
 						case 40:
-							//down key
 							ps
 								.next('tr')
 								.find(selector)
@@ -355,7 +351,6 @@
 							break;
 
 						case 38:
-						 	// up key
 							ps
 								.prev('tr')
 								.find(selector)
