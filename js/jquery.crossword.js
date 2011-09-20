@@ -62,6 +62,21 @@
 					puzzEl.delegate('input', 'keyup', function(e){
 						mode = 'interacting';
 						
+						
+						// need to figure out orientation up front, before we attempt to highlight an entry
+						switch(e.which) {
+							case 39:
+							case 37:
+								currOri = 'across';
+								break;
+							case 38:
+							case 40:
+								currOri = 'down';
+								break;
+							default:
+								break;
+						}
+						
 						if ( e.keyCode === 9) {
 							return false;
 						} else if (
@@ -72,20 +87,7 @@
 							e.keyCode === 8 ||
 							e.keyCode === 46 ) {			
 												
-											
-							// need to figure out orientation up front, before we attempt to highlight an entry
-							switch(e.which) {
-								case 39:
-								case 37:
-									currOri = 'across';
-									break;
-								case 38:
-								case 40:
-									currOri = 'down';
-									break;
-								default:
-									break;
-							}
+
 							
 							if (e.keyCode === 8 || e.keyCode === 46) {
 								currOri === 'across' ? nav.nextPrevNav(e, 37) : nav.nextPrevNav(e, 38); 
@@ -97,6 +99,7 @@
 							return false;
 						} else {
 							
+							console.log('input keyup: '+solvedToggle);
 							puzInit.checkAnswer(e);
 
 							if(!solvedToggle){
@@ -110,11 +113,16 @@
 					});
 			
 					// tab navigation handler setup
-					puzzEl.delegate('input', 'keydown click', function(e) {
-						mode = "setting ui";
+					puzzEl.delegate('input', 'keydown', function(e) {
 
-						if ( e.keyCode === 9 || !e.keyCode) {
+						if ( e.keyCode === 9) {
+							mode = "setting ui";
+							
+							if (solvedToggle) solvedToggle = false;
+
+							//puzInit.checkAnswer(e)
 							nav.updateByEntry(e);
+							
 						} else {
 							return true;
 						}
@@ -123,10 +131,23 @@
 									
 					});
 					
+					// tab navigation handler setup
+					puzzEl.delegate('input', 'click', function(e) {
+						mode = "setting ui";
+						if (solvedToggle) solvedToggle = false;
+
+						console.log('input click: '+solvedToggle);
+					
+						nav.updateByEntry(e);
+						e.preventDefault();
+									
+					});
+					
 					
 					// click/tab clues 'navigation' handler setup
 					clues.delegate('li', 'click', function(e) {
-						mode = 'setting ui';				
+						mode = 'setting ui';
+						
 						if (!e.keyCode) {
 							nav.updateByNav(e);
 						} 
@@ -283,7 +304,7 @@
 						.get()
 						.join('');
 					
-				
+				console.log(currVal + " " + valToCheck);
 					if(valToCheck === currVal){	
 						$('.active')
 							.addClass('done')
@@ -296,6 +317,7 @@
 					}
 					//z++;
 					//console.log(z);
+					console.log('checkAnswer() solvedToggle: '+solvedToggle);
 
 				}				
 
@@ -321,7 +343,9 @@
 					$('.current').removeClass('current');
 					
 					selector = '.position-' + activePosition + ' input';
-										
+					
+					console.log('nextPrevNav activePosition & struck: '+ activePosition + ' '+struck);
+						
 					// move input focus/select to 'next' input
 					switch(struck) {
 						case 39:
@@ -400,9 +424,6 @@
 				updateByEntry: function(e, next) {
 					var classes, next, clue, e1Ori, e2Ori, e1Cell, e2Cell;
 					
-					//$('.current').removeClass('current');
-					//currIndex = 0;
-					
 					if(e.keyCode === 9 || next){
 						// handle tabbing through problems, which keys off clues and requires different handling		
 						activeClueIndex = activeClueIndex === clueLiEls.length-1 ? 0 : ++activeClueIndex;
@@ -425,7 +446,9 @@
 						
 						clue = $(clueLiEls + '[data-position=' + activePosition + ']');
 						activeClueIndex = $(clueLiEls).index(clue);
-						//console.log('updateByEntry() not tab activeClueIndex: '+activeClueIndex);
+						
+						currOri = clue.parent().prop('id');
+						
 					}
 						
 						util.highlightEntry();
@@ -478,6 +501,7 @@
 				},
 
 				getActivePositionFromClassGroup: function(el){
+
 						classes = util.getClasses($(el).parent(), 'position');
 
 						if(classes.length > 1){
@@ -489,8 +513,8 @@
 							// entry of opposite orientation, switch to select this one instead
 							e1Cell = $('.position-' + classes[0].split('-')[1] + ' input').index(el);
 							e2Cell = $('.position-' + classes[1].split('-')[1] + ' input').index(el);
-							
-							if(mode !== "interacting"){
+
+							if(mode === "setting ui"){
 								currOri = e1Cell === 0 ? e1Ori : e2Ori; // change orientation if cell clicked was first in a entry of opposite direction
 							}
 
@@ -502,10 +526,12 @@
 						} else {
 							activePosition = classes[0].split('-')[1];						
 						}
+						
+						console.log('getActivePositionFromClassGroup currOri: '+currOri);
+						
 				},
 				
 				checkSolved: function(valToCheck) {
-					console.log('hi');
 					for (var i=0, s=solved.length; i < s; i++) {
 						if(valToCheck === solved[i]){
 							return true;
