@@ -282,9 +282,6 @@
 					- If not complete, auto-selects next input for user
 				*/
 				checkAnswer: function(e) {
-					if (solvedToggle) {
-						//solvedToggle = false;
-					};
 					
 					var valToCheck, currVal;
 					
@@ -524,7 +521,7 @@
 							activePosition = classes[0].split('-')[1];						
 						}
 						
-						console.log('getActivePositionFromClassGroup currOri: '+currOri);
+						console.log('getActivePositionFromClassGroup activePosition: '+activePosition);
 						
 				},
 				
