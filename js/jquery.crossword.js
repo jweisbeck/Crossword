@@ -100,12 +100,9 @@
 						} else {
 							
 							console.log('input keyup: '+solvedToggle);
+							
 							puzInit.checkAnswer(e);
 
-							if(!solvedToggle){
-								// User not yet at last input, so auto-select next one!
-								currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
-							}
 						}
 
 						e.preventDefault();
@@ -116,8 +113,8 @@
 					puzzEl.delegate('input', 'keydown', function(e) {
 
 						if ( e.keyCode === 9) {
-							mode = "setting ui";
 							
+							mode = "setting ui";
 							if (solvedToggle) solvedToggle = false;
 
 							//puzInit.checkAnswer(e)
@@ -286,7 +283,7 @@
 				*/
 				checkAnswer: function(e) {
 					if (solvedToggle) {
-						solvedToggle = false;
+						//solvedToggle = false;
 					};
 					
 					var valToCheck, currVal;
@@ -304,7 +301,7 @@
 						.get()
 						.join('');
 					
-				console.log(currVal + " " + valToCheck);
+					//console.log(currVal + " " + valToCheck);
 					if(valToCheck === currVal){	
 						$('.active')
 							.addClass('done')
@@ -314,10 +311,14 @@
 
 						solved.push(valToCheck);
 						solvedToggle = true;
+						return;
 					}
+					
+					currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
+					
 					//z++;
 					//console.log(z);
-					console.log('checkAnswer() solvedToggle: '+solvedToggle);
+					//console.log('checkAnswer() solvedToggle: '+solvedToggle);
 
 				}				
 
@@ -344,7 +345,7 @@
 					
 					selector = '.position-' + activePosition + ' input';
 					
-					console.log('nextPrevNav activePosition & struck: '+ activePosition + ' '+struck);
+					//console.log('nextPrevNav activePosition & struck: '+ activePosition + ' '+struck);
 						
 					// move input focus/select to 'next' input
 					switch(struck) {
@@ -354,8 +355,7 @@
 								.find('input')
 								.addClass('current')
 								.select();
-							//util.getCurrent();
-							//$('.current').select();
+
 							break;
 						
 						case 37:
@@ -364,8 +364,7 @@
 								.find('input')
 								.addClass('current')
 								.select();
-							//util.getCurrent();
-							//$('.current').select();
+
 							break;
 
 						case 40:
@@ -374,8 +373,7 @@
 								.find(selector)
 								.addClass('current')
 								.select();
-							//util.getCurrent();
-							//$('.current').select();
+
 							break;
 
 						case 38:
@@ -384,8 +382,7 @@
 								.find(selector)
 								.addClass('current')
 								.select();
-							//util.getCurrent();
-							//$('.current').select();
+
 							break;
 
 						default:
@@ -542,7 +539,7 @@
 				
 				getSkips: function(position) {
 					if ($(clueLiEls[position]).hasClass('clue-done')){
-						activeClueIndex = position >= activeClueIndex.length ? 0 : ++activeClueIndex;
+						activeClueIndex = position === clueLiEls.length-1 ? 0 : ++activeClueIndex;
 						util.getSkips(activeClueIndex);						
 					} else {
 						return false;
