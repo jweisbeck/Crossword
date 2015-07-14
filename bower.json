@@ -1,0 +1,10 @@
+{
+  "name": "Crossword",
+  "version": "0.0.0",
+  "homepage": "https://github.com/jweisbeck/Crossword",
+  "main": "./js/jquery.crossword.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*"
+  ]
+}
