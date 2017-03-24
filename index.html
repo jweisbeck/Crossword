@@ -91,6 +91,15 @@
 			margin: .3em;
 			line-height: 1.6em;
 		}
+
+		ol {
+  			list-style: none;
+  			padding-left: 10px;
+		}
+
+		ol > li:before {
+  			content: attr(seq) ". ";
+		}
 		
 	</style>
 
