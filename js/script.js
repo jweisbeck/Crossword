@@ -118,7 +118,7 @@
 					starty: 5
 				},
 				{
-					clue: "Emits a lout wailing sound",
+					clue: "Emits a loud wailing sound",
 					answer: "siren",
 					position: 11,
 					orientation: "down",
