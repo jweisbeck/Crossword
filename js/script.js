@@ -54,7 +54,7 @@
 					starty: 9
 				},
 				{
-					clue: "Type of ray emitted frm the sun",
+					clue: "Type of ray emitted from the sun",
 					answer: "gamma",
 					position: 16,
 					orientation: "across",
