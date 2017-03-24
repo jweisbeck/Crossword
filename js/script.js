@@ -54,7 +54,7 @@
 					starty: 9
 				},
 				{
-					clue: "Type of ray emitted frm the sun",
+					clue: "Type of ray emitted from the sun",
 					answer: "gamma",
 					position: 16,
 					orientation: "across",
@@ -118,7 +118,7 @@
 					starty: 5
 				},
 				{
-					clue: "Emits a lout wailing sound",
+					clue: "Emits a loud wailing sound",
 					answer: "siren",
 					position: 11,
 					orientation: "down",
