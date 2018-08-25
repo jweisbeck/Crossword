@@ -1,7 +1,7 @@
-
-/**
-* Jesse Weisbeck's Crossword Puzzle (for all 3 people left who want to play them)
+/*
+* Jesse Weisbeck's Crossword Puzzle 
 *
+* modified by Matej Jurko
 */
 (function($){
 	$.fn.crossword = function(entryData) {
@@ -21,14 +21,23 @@
 			*/
 			
 			var puzz = {}; // put data array in object literal to namespace it into safety
-			puzz.data = entryData;
+			puzz.data = entryData.words;
+			puzz.chars = entryData.chars;
+			puzz.answer = entryData.answer;
 			
 			// append clues markup after puzzle wrapper div
 			// This should be moved into a configuration object
-			this.after('<div id="puzzle-clues"><h2>Across</h2><ul id="across"></ul><h2>Down</h2><ul id="down"></ul></div>');
+			$("#puzzle-wrapper").before(`
+				<h1>Word shuffle</h1>
+				<p>Mix letters below to find words. Some of theese letters are part of a key. 
+				You win when you correctly guess all letters in a key. Good luck
+				</p><div id="puzzle-clues">
+				<ol id="across"></ol></div>
+				<table style="display:none;" char-index="6"><tr><td></td></tr></table>`
+			);
 			
 			// initialize some variables
-			var tbl = ['<table id="puzzle">'],
+			var tbl = ['<table id="puzzle" class="crosswordtable">'],
 			    puzzEl = this,
 				clues = $('#puzzle-clues'),
 				clueLiEls,
@@ -46,7 +55,8 @@
 				targetInput,
 				mode = 'interacting',
 				solvedToggle = false,
-				z = 0;
+				z = 0,
+				formattedKeys = [];
 
 			var puzInit = {
 				
@@ -94,6 +104,7 @@
 							} else {
 								nav.nextPrevNav(e);
 							}
+							util.checkKeys();
 							
 							e.preventDefault();
 							return false;
@@ -105,8 +116,13 @@
 
 						}
 
+						if(util.checkAllSolved())
+							alert("Congrats");
+						
+						util.checkKeys();
+
 						e.preventDefault();
-						return false;					
+						return false;		
 					});
 			
 					// tab navigation handler setup
@@ -118,6 +134,7 @@
 							if (solvedToggle) solvedToggle = false;
 
 							//puzInit.checkAnswer(e)
+
 							nav.updateByEntry(e);
 							
 						} else {
@@ -190,8 +207,12 @@
 							entries[i][x] = coords; 
 						}
 
-						// while we're in here, add clues to DOM!
-						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-position="' + i + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
+						// while we're in here, add clues to DOM! - add only if clue is defined
+						if(puzz.data[i].clue && i != puzz.data.length-2)
+							$('#' + puzz.data[i].orientation).append('<li class="nonumber" tabindex="1" data-position="' + i + '">' + puzz.data[i].position + ". " + puzz.data[i].clue + '</li>'); 
+						else if(puzz.data[i].clue)
+							$('#' + puzz.data[i].orientation).append('<li style="margin-top: 6.4em;" class="nonumber" tabindex="1" data-position="' + i + '"><b>' + puzz.data[i].clue + '</b></li>'); 
+						console.log(puzz.data.length);
 					}				
 					
 					// Calculate rows/cols by finding max coords of each entry, then picking the highest
@@ -204,7 +225,7 @@
 
 					rows = Math.max.apply(Math, rows) + "";
 					cols = Math.max.apply(Math, cols) + "";
-		
+							
 				},
 				
 				/*
@@ -230,17 +251,17 @@
 					- Adds tabindexes to <inputs> 
 				*/
 				buildEntries: function() {
-					var puzzCells = $('#puzzle td'),
-						light,
+					var light,
 						$groupedLights,
 						hasOffset = false,
-						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and highest POSITIONS
+						positionOffset = entryCount - puzz.data[puzz.data.length-1].position, // diff. between total ENTRIES and highest POSITIONS
+						input;
 						
 					for (var x=1, p = entryCount; x <= p; ++x) {
 						var letters = puzz.data[x-1].answer.split('');
 
 						for (var i=0; i < entries[x-1].length; ++i) {
-							light = $(puzzCells +'[data-coords="' + entries[x-1][i] + '"]');
+							light = $('[data-coords="' + entries[x-1][i] + '"]');
 							
 							// check if POSITION property of the entry on current go-round is same as previous. 
 							// If so, it means there's an across & down entry for the position.
@@ -251,23 +272,62 @@
 								};
 							}
 							
-							if($(light).empty()){
+							// cell contains space
+							if(letters[i] == ' ')
+							{
+								input = '<input class="crosswinput" maxlength="1" val="" type="text" tabindex="-1" disabled value=" "/>'
+								$(light).addClass('space');
+								//$(light).css( "width", "0" );
+								//$(light).css( "heigth", "0" );
+								$(light).css( "z-index", "10" );
+								$(light).css( "border", "2px dotted black" );
+							}
+							else input = '<input class="crosswinput" maxlength="1" val="" type="text" tabindex="-1"/>';
+							//console.log((hasOffset ? x - positionOffset : x));
+							//console.log("Beseda:"+x+", crka "+letters[i]);
+							
+							if($(light).children().length === 0){
 								$(light)
 									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
-									.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
+									.append(input);
+									// Put entry number in first 'light' of each entry, skipping it if already present
+									if (i == 0) {
+										//$(light).append('<span>' + puzz.data[x-1].position + '</span>');
+									}
 							}
+							else {
+								$(light)
+									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) );
+									console.log("is empty");
+								if (i == 0) {
+									//$(light).find("span").text($(light).find("span").text()+(', ' + puzz.data[x-1].position));
+								}
+							}
+							
+							for(var j=0, dat=puzz.chars; j < dat.length; j++)
+							{
+								//var charx = dat[j].splice('')[0];
+								//var chary = dat[j].splice('')[1];
+								
+								if($(light).attr('data-coords') == dat[j])
+								{
+									$(light).append($("<span>" + (j+1) + "</span>").attr('char-index',j));
+								}
+							}
+							
 						};
+						
+						
+						
+						//console.log(letters);
+						//console.log(entries);
 						
 					};	
 					
-					// Put entry number in first 'light' of each entry, skipping it if already present
-					for (var i=1, p = entryCount; i < p; ++i) {
-						$groupedLights = $('.entry-' + i);
-						if(!$('.entry-' + i +':eq(0) span').length){
-							$groupedLights.eq(0)
-								.append('<span>' + puzz.data[i].position + '</span>');
-						}
-					}	
+					// unused chars
+					$("td[class*='entry-7'] input").val(puzz.data[6].answer);
+					$("td[class*='entry-7']").parent().css("display","none");
+					$("td[class*='entry-7'] input").attr('disabled','disabled');
 					
 					util.highlightEntry();
 					util.highlightClue();
@@ -288,7 +348,7 @@
 					util.getActivePositionFromClassGroup($(e.target));
 				
 					valToCheck = puzz.data[activePosition].answer.toLowerCase();
-
+					
 					currVal = $('.position-' + activePosition + ' input')
 						.map(function() {
 					  		return $(this)
@@ -298,6 +358,8 @@
 						.get()
 						.join('');
 					
+					
+					
 					//console.log(currVal + " " + valToCheck);
 					if(valToCheck === currVal){	
 						$('.active')
@@ -305,13 +367,14 @@
 							.removeClass('active');
 					
 						$('.clues-active').addClass('clue-done');
-
-						solved.push(valToCheck);
+						if(solved.indexOf(valToCheck) == -1)
+							solved.push(valToCheck);
 						solvedToggle = true;
 						return;
 					}
 					
-					currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
+					if(e.keyCode != 8)
+						currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
 					
 					//z++;
 					//console.log(z);
@@ -340,7 +403,7 @@
 					
 					$('.current').removeClass('current');
 					
-					selector = '.position-' + activePosition + ' input';
+					selector = '.position-' + activePosition + ' input:not([disabled])';
 					
 					//console.log('nextPrevNav activePosition & struck: '+ activePosition + ' '+struck);
 						
@@ -348,17 +411,19 @@
 					switch(struck) {
 						case 39:
 							p
-								.next()
-								.find('input')
+								.nextAll()
+								.find('input:not([disabled])')
+								.first()
 								.addClass('current')
 								.select();
-
+							
 							break;
 						
 						case 37:
 							p
-								.prev()
-								.find('input')
+								.prevAll()
+								.find('input:not([disabled])')
+								.last()
 								.addClass('current')
 								.select();
 
@@ -366,8 +431,9 @@
 
 						case 40:
 							ps
-								.next('tr')
+								.nextAll('tr')
 								.find(selector)
+								.first()
 								.addClass('current')
 								.select();
 
@@ -375,8 +441,9 @@
 
 						case 38:
 							ps
-								.prev('tr')
+								.prevAll('tr')
 								.find(selector)
+								.last()
 								.addClass('current')
 								.select();
 
@@ -407,7 +474,7 @@
 					$('.active').eq(0).addClass('current');
 					
 					// store orientation for 'smart' auto-selecting next input
-					currOri = $('.clues-active').parent('ul').prop('id');
+					currOri = $('.clues-active').parent('ol').prop('id');
 										
 					activeClueIndex = $(clueLiEls).index(e.target);
 					//console.log('updateByNav() activeClueIndex: '+activeClueIndex);
@@ -438,7 +505,7 @@
 					
 						util.getActivePositionFromClassGroup(e.target);
 						
-						clue = $(clueLiEls + '[data-position=' + activePosition + ']');
+						clue = $('[data-position=' + activePosition + ']');
 						activeClueIndex = $(clueLiEls).index(clue);
 						
 						currOri = clue.parent().prop('id');
@@ -469,10 +536,10 @@
 				highlightClue: function() {
 					var clue;				
 					$('.clues-active').removeClass('clues-active');
-					$(clueLiEls + '[data-position=' + activePosition + ']').addClass('clues-active');
+					$('[data-position=' + activePosition + ']').addClass('clues-active');
 					
 					if (mode === 'interacting') {
-						clue = $(clueLiEls + '[data-position=' + activePosition + ']');
+						clue = $('[data-position=' + activePosition + ']');
 						activeClueIndex = $(clueLiEls).index(clue);
 					};
 				},
@@ -500,8 +567,8 @@
 
 						if(classes.length > 1){
 							// get orientation for each reported position
-							e1Ori = $(clueLiEls + '[data-position=' + classes[0].split('-')[1] + ']').parent().prop('id');
-							e2Ori = $(clueLiEls + '[data-position=' + classes[1].split('-')[1] + ']').parent().prop('id');
+							e1Ori = $('[data-position=' + classes[0].split('-')[1] + ']').parent().prop('id');
+							e2Ori = $('[data-position=' + classes[1].split('-')[1] + ']').parent().prop('id');
 
 							// test if clicked input is first in series. If so, and it intersects with
 							// entry of opposite orientation, switch to select this one instead
@@ -533,13 +600,56 @@
 
 					}
 				},
+				checkAllSolved: function() {
+					return solved.length === puzz.data.length ? true : false;
+				},
 				
 				getSkips: function(position) {
-					if ($(clueLiEls[position]).hasClass('clue-done')){
+					if ($(clueLiEls[position]).hasClass('clue-done') && !util.checkAllSolved()){
 						activeClueIndex = position === clueLiEls.length-1 ? 0 : ++activeClueIndex;
-						util.getSkips(activeClueIndex);						
+						util.getSkips(activeClueIndex);
 					} else {
 						return false;
+					}
+				},
+				// checks keys
+				/*
+					Remaps the key chars, for ex:
+					
+					1: w
+					2: i
+					3: n
+				*/
+				checkKeys: function() {
+					var keys = $("[char-index]");
+					
+					for(m = 0;m < keys.length;m++){
+						var newObj = [];
+						var inputNode;
+						var nodeList = keys[m].parentNode.childNodes
+						
+						for(var n=0;n<nodeList.length;n++){
+							if(nodeList[n].nodeName == "INPUT"){
+								formattedKeys[keys[m].getAttribute("char-index")] = nodeList[n].value;
+							}
+						}
+					}
+					console.log(formattedKeys);
+					if(formattedKeys.join('') == puzz.answer.toLowerCase())
+						$("#msg").text("You won. Congratulations!");
+					
+					util.printKeys();
+					console.log(formattedKeys.join('')+"=="+puzz.answer.toLowerCase());
+				},
+				printKeys: function() {
+					if(	activePosition!=5)
+					{
+						var key = formattedKeys.join('');
+						$("#key p").text(key);
+						
+						$.each(formattedKeys, function(key,value){
+							$(".entry-6 input").eq(key).val(value);
+						});						
 					}
 				}
 				
