@@ -99,7 +99,7 @@
 							return false;
 						} else {
 							
-							// console.log('input keyup: '+solvedToggle);
+							console.log('input keyup: '+solvedToggle);
 							
 							puzInit.checkAnswer(e);
 
@@ -133,7 +133,7 @@
 						mode = "setting ui";
 						if (solvedToggle) solvedToggle = false;
 
-						// console.log('input click: '+solvedToggle);
+						console.log('input click: '+solvedToggle);
 					
 						nav.updateByEntry(e);
 						e.preventDefault();
@@ -191,7 +191,7 @@
 						}
 
 						// while we're in here, add clues to DOM!
-						$('#' + puzz.data[i].orientation).append('<li value="' + puzz.data[i].position + '" tabindex="1" data-position="' + i + '">' + puzz.data[i].clue + '</li>');
+						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-position="' + i + '">' + puzz.data[i].clue + '</li>'); 
 					}				
 					
 					// Calculate rows/cols by finding max coords of each entry, then picking the highest
@@ -236,24 +236,24 @@
 						hasOffset = false,
 						positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and highest POSITIONS
 						
-					for (var x=0, p = entryCount - 1; x <= p; x++) {
-						var letters = puzz.data[x].answer.split('');
+					for (var x=1, p = entryCount; x <= p; ++x) {
+						var letters = puzz.data[x-1].answer.split('');
 
-						for (var i=0; i < entries[x].length; ++i) {
-							light = $(puzzCells +'[data-coords="' + entries[x][i] + '"]');
+						for (var i=0; i < entries[x-1].length; ++i) {
+							light = $(puzzCells +'[data-coords="' + entries[x-1][i] + '"]');
 							
 							// check if POSITION property of the entry on current go-round is same as previous. 
 							// If so, it means there's an across & down entry for the position.
 							// Therefore you need to subtract the offset when applying the entry class.
 							if(x > 1 ){
-								if (puzz.data[x].position === puzz.data[x-1].position) {
+								if (puzz.data[x-1].position === puzz.data[x-2].position) {
 									hasOffset = true;
 								};
 							}
 							
 							if($(light).empty()){
 								$(light)
-									.addClass('entry-' + (x) + ' position-' + (x) )
+									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
 									.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
 							}
 						};
@@ -261,9 +261,8 @@
 					};	
 					
 					// Put entry number in first 'light' of each entry, skipping it if already present
-					for (var i=0, p = entryCount; i < p; i++) {
+					for (var i=1, p = entryCount; i < p; ++i) {
 						$groupedLights = $('.entry-' + i);
-
 						if(!$('.entry-' + i +':eq(0) span').length){
 							$groupedLights.eq(0)
 								.append('<span>' + puzz.data[i].position + '</span>');
@@ -522,7 +521,7 @@
 							activePosition = classes[0].split('-')[1];						
 						}
 						
-						// console.log('getActivePositionFromClassGroup activePosition: '+activePosition);
+						console.log('getActivePositionFromClassGroup activePosition: '+activePosition);
 						
 				},
 				
