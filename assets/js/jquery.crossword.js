@@ -102,7 +102,7 @@ $(document).ready(function(){
 
 						// console.log('input keyup: '+solvedToggle);
 
-						puzInit.checkAnswer(e);
+						puzInit.moveToNext(e);
 
 					}
 
@@ -118,7 +118,6 @@ $(document).ready(function(){
 						mode = "setting ui";
 						if (solvedToggle) solvedToggle = false;
 
-						//puzInit.checkAnswer(e)
 						nav.updateByEntry(e);
 
 					} else {
@@ -283,36 +282,51 @@ $(document).ready(function(){
                 - Checks current entry input group value against answer
                 - If not complete, auto-selects next input for user
             */
-			checkAnswer: function(e) {
+			moveToNext: function(e) {
+				let complete;
 
-				var valToCheck, currVal;
+				for(let i = 1; i < $("tr").length + 1; i++){
+					for(let j = 1; j < $("tr:first td").length + 1; j++){
+						let coord = i + ',' + j;
+						if($("[data-coords='" + coord + "'] input").val() === ''){
+							complete = false;
+							break
+						}
+						else
+							complete = true
+					}
+				}
+
+				if (complete === true)
+					$("[type='submit']").removeAttr("disabled");
+				// var valToCheck, currVal;
 
 				util.getActivePositionFromClassGroup($(e.target));
 
-				valToCheck = puzz.data[activePosition].answer.toLowerCase();
-
-				currVal = $('.position-' + activePosition + ' input')
-					.map(function() {
-						return $(this)
-							.val()
-							.toLowerCase();
-					})
-					.get()
-					.join('');
-
-				//console.log(currVal + " " + valToCheck);
-				if(valToCheck === currVal){
-					$('.active')
-						.addClass('done')
-						.removeClass('active');
-
-					$('.clues-active').addClass('clue-done');
-
-					solved.push(valToCheck);
-					solvedToggle = true;
-					return;
-				}
-
+			// 	valToCheck = puzz.data[activePosition].answer.toLowerCase();
+			//
+			// 	currVal = $('.position-' + activePosition + ' input')
+			// 		.map(function() {
+			// 			return $(this)
+			// 				.val()
+			// 				.toLowerCase();
+			// 		})
+			// 		.get()
+			// 		.join('');
+			//
+			// 	//console.log(currVal + " " + valToCheck);
+			// 	if(valToCheck === currVal){
+			// 		$('.active')
+			// 			.addClass('done')
+			// 			.removeClass('active');
+			//
+			// 		$('.clues-active').addClass('clue-done');
+			//
+			// 		solved.push(valToCheck);
+			// 		solvedToggle = true;
+			// 		return;
+			// 	}
+			//
 				currOri === 'across' ? nav.nextPrevNav(e, 39) : nav.nextPrevNav(e, 40);
 
 				//z++;

@@ -17,6 +17,23 @@
 <button id="solution">Solution</button>
 <button id="save">Save</button>
 
+<form method="post">
+	<label for="alumniNr">Alumni number:</label>
+	<input id="alumniNr" type="text">
+	<label for="name">Name:</label>
+	<input id="name" type="text" required>
+	<label for="email">Email:</label>
+	<input id="email" type="text" required>
+	<label for="college">College:</label>
+	<input id="college" type="text" required>
+	<label for="yearOfMatric">Year of matriculation: *</label>
+	<input id="yearOfMatric" type="text">
+	<label for="notes">Solution notes/comments:</label>
+	<textarea id="notes"></textarea>
+
+	<button type="submit" disabled>Submit</button>
+</form>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="assets/js/jquery.crossword.js"></script>
 <script src="assets/js/script.js"></script>
