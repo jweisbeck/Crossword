@@ -550,11 +550,13 @@ $(document).ready(function(){
 
 		puzInit.init();
 
-		$("button").click(function(){
-			showSolution();
-		});
+		restoreCrossword();
 
-		let showSolution = function(){
+		$("#solution").click(showSolution);
+
+		$("#save").click(save);
+
+		function showSolution(){
 
 			for(let i = 0; i<puzz.data.length; i++){
 				// console.log($("td").hasClass('position-' + i));
@@ -577,8 +579,32 @@ $(document).ready(function(){
 					$("[data-coords='" + newCoord + "'].position-" + i + " input").val(word.substr(j, 1));
 				}
 			}
+		}
+		
+		function save() {
+			let crossword = [];
 
+			for(let i = 1; i < $("tr").length + 1; i++){
+				crossword[i] = [];
+				for(let j = 1; j < $("tr:first td").length + 1; j++){
+					let coord = i + ',' + j;
+					crossword[i][j] = $("[data-coords='" + coord + "'] input").val();
+				}
+			}
+			localStorage.setItem("crossword", JSON.stringify(crossword));
+		}
+		
+		function restoreCrossword() {
+			if (localStorage.getItem("crossword") !== null) {
+				let crossword = JSON.parse(localStorage.getItem("crossword"));;
 
+				for(let i = 1; i < $("tr").length + 1; i++){
+					for(let j = 1; j < $("tr:first td").length + 1; j++){
+						let coord = i + ',' + j;
+						$("[data-coords='" + coord + "'] input").val(crossword[i][j])
+					}
+				}
+			}
 		}
 	}
 });
