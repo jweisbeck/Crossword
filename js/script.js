@@ -30,7 +30,7 @@
 					starty: 3
 				},
 				{
-					clue: "The speeds of engines without and accelaration",
+					clue: "The speeds of engines without and acceleration",
 					answer: "idlespeeds",
 					position: 8,
 					orientation: "across",
@@ -54,7 +54,7 @@
 					starty: 9
 				},
 				{
-					clue: "Type of ray emitted frm the sun",
+					clue: "Type of ray emitted from the sun",
 					answer: "gamma",
 					position: 16,
 					orientation: "across",
@@ -94,7 +94,7 @@
 					starty: 1
 				},
 				{
-					clue: "Greek variable that usually describes rotor positon",
+					clue: "Greek variable that usually describes rotor position",
 					answer: "theta",
 					position: 6,
 					orientation: "down",
