@@ -1,0 +1,25 @@
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 233">
+  <symbol id="ufo">
+    <g style="mix-blend-mode:difference">
+      <path d="m146.515 108.224 46.054 54.067M89.192 132.334l6.663 70.709M102.689 139.48l3.695 29.918" stroke="currentColor" stroke-width="1.726" stroke-linecap="round"/>
+      <path d="M141.353 47.45C109.1 70.34 89.148 78.73 50.23 85.774c-2.553-50.216 57.017-75.27 91.123-38.326Z" stroke="currentColor" stroke-width="1.726" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M133.221 39.212c48.147-13.015 59.273 16.21 16.298 41.521-29.429 17.332-47.201 24.964-81.218 34.16-48.147 13.015-61.254-15.377-18.279-40.688" stroke="currentColor" stroke-width="1.726" stroke-linecap="round"/>
+      <path d="M149.731 81.227c-10.967 27.926-53.092 45.643-80.722 33.951" stroke="currentColor" stroke-width="1.726" stroke-linecap="round"/>
+      <circle cx="3.761" cy="3.761" r="2.898" transform="scale(-1 1) rotate(22.811 -259.313 -221.768)" stroke="currentColor" stroke-width="1.726"/>
+      <circle cx="3.761" cy="3.761" r="2.898" transform="scale(-1 1) rotate(22.811 -238.574 -299.62)" stroke="currentColor" stroke-width="1.726"/>
+      <circle cx="3.761" cy="3.761" r="2.898" transform="scale(-1 1) rotate(22.811 -205.26 -366.067)" stroke="currentColor" stroke-width="1.726"/>
+      <circle cx="3.761" cy="3.761" r="2.898" transform="scale(-1 1) rotate(22.811 -270.456 -141.944)" stroke="currentColor" stroke-width="1.726"/>
+      <circle cx="3.761" cy="3.761" r="2.898" transform="scale(-1 1) rotate(22.811 -265.432 -67.8)" stroke="currentColor" stroke-width="1.726"/>
+      <circle cx="1.726" cy="1.726" r=".863" transform="scale(1 -1) rotate(14.668 862.14 736.781)" stroke="currentColor" stroke-width="1.726"/>
+      <circle cx="3.021" cy="3.021" r="2.158" transform="scale(1 -1) rotate(14.668 594.524 468.436)" stroke="currentColor" stroke-width="1.726"/>
+      <path d="M103.354 51.6c.3.288.636.383.912.266a.763.763 0 0 0 .406-1.002c-.053-.125-.167-.255-.281-.384l-6.77-6.263c-.335-.302-.6-.368-.927-.23-.326.139-.467.435-.48.826l-.217 9.22c.013.171.027.343.08.47.16.376.6.575 1.002.405.276-.117.442-.424.444-.84l.097-7.894 5.734 5.426Zm-7.69 10.93c.628-.266 1.106-.676.861-1.254a.733.733 0 0 0-.965-.391c-.151.064-.406.231-.582.305-.804.34-2.206-.31-3.053-.841.591-1.614 1.145-3.596.454-5.23-.798-1.885-2.794-2.61-4.78-1.77-1.985.84-2.854 2.778-2.056 4.663.691 1.634 2.5 2.617 4.07 3.315-.209.978-.717 2.437-1.522 2.778-.175.074-.473.141-.624.205a.734.734 0 0 0-.391.966c.244.578.872.52 1.5.254 1.709-.724 2.268-2.205 2.618-3.687 1.308.78 2.76 1.41 4.47.687Zm-14.407-1.578c.3.288.636.383.912.266a.763.763 0 0 0 .406-1.002c-.053-.125-.167-.255-.281-.385l-6.77-6.262c-.335-.302-.6-.368-.927-.23-.326.139-.467.435-.48.826l-.217 9.22c.013.171.027.343.08.469.16.377.6.576 1.002.406.276-.117.442-.425.444-.84l.097-7.894 5.734 5.426Z" fill="currentColor"/>
+    </g>
+    <path d="M299.87 127.87c-19.5 0-24-4.5-24-24 0 19.5-4.5 24-24 24 19.5 0 24 4.5 24 24 0-19.5 4.5-24 24-24Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="mix-blend-mode:difference"/>
+    <circle cx="5" cy="5" r="4" transform="scale(-1 1) rotate(42.043 -259.894 -388.098)" stroke="currentColor" stroke-width="2" style="mix-blend-mode:difference"/>
+    <circle cx="2" cy="2" r="1" transform="scale(-1 1) rotate(42.043 -263.502 -405.91)" stroke="currentColor" stroke-width="2" style="mix-blend-mode:difference"/>
+    <circle cx="3.5" cy="3.5" r="2.5" transform="scale(-1 1) rotate(42.043 -273.508 -399.302)" stroke="currentColor" stroke-width="2" style="mix-blend-mode:difference"/>
+    <circle cx="5" cy="5" r="4" transform="scale(1 -1) rotate(17.289 767.302 1261.66)" stroke="currentColor" stroke-width="2" style="mix-blend-mode:difference"/>
+    <circle cx="2" cy="2" r="1" transform="scale(1 -1) rotate(17.289 799.395 101.173)" stroke="currentColor" stroke-width="2" style="mix-blend-mode:difference"/>
+    <circle cx="3.5" cy="3.5" r="2.5" transform="scale(1 -1) rotate(17.289 725.684 1170.947)" stroke="currentColor" stroke-width="2" style="mix-blend-mode:difference"/>
+  </symbol>
+</svg>

@@ -1,0 +1,277 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  transition: color, border 0.1s;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  position: relative;
+  min-height: 100dvb;
+  margin: 10px auto;
+  font-family: 'Spot Mono', sans-serif;
+  font-weight: 300;
+  font-size: 20px;
+  background-color: #000;
+  color: var(--main-color);
+}
+
+a {
+  color: currentColor;
+  text-decoration: none;
+}
+
+a:focus {
+  outline: none;
+}
+
+a:hover,
+a:focus-visible {
+  text-decoration: underline;
+}
+
+h2 {
+  font-size: 22px;
+  line-height: 1.6em;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+p {
+  margin: 0;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1280px;
+  margin: auto;
+  padding: 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 35px;
+}
+
+.logo__icon {
+  display: block;
+  width: 112px;
+  height: 40px;
+  color: var(--main-color)
+}
+
+.nav__item {
+  font-size: 22px;
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+}
+
+.colorpicker {
+  position: absolute;
+  inset: 50%;
+}
+
+.colors {
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color input {
+  display: none;
+}
+
+.color-label {
+  width: 15px;
+  color: var(--bg-color);
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: currentColor;
+  transition: scale 0.2s;
+  transform-origin: center;
+  cursor: pointer;
+}
+
+.color-label:has(:checked) {
+  scale: 1.8;
+}
+
+main {
+  display: flex;
+  align-items: center;
+  max-width: 1280px;
+  margin: auto;
+  padding: 250px 50px;
+}
+
+.about {
+  height: 60dvb;
+  padding-block: 0;
+}
+
+table {
+  max-width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table tr {
+  width: 100%;
+}
+
+table td {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+td input {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: none;
+  padding: 0em;
+  color: #fff;
+  font-size: 30px;
+  border: 1px solid var(--main-color);
+  text-align: center;
+  text-transform: uppercase;
+  background-color: transparent;
+}
+
+td input:focus {
+
+}
+
+td span {
+  position: absolute;
+  top: 1px;
+  left: 3px;
+  font-size: 15px;
+}
+
+input.done {
+  color: green;
+}
+
+.active,
+.clues-active {
+}
+.clue-done {
+  text-decoration: line-through;
+}
+
+#puzzle-wrapper {
+  flex-basis: 50%;
+  margin-right: 3%;
+  padding: 20px;
+  background-color: #000;
+}
+
+#puzzle {
+  min-width: 600px;
+}
+
+#puzzle-clues {
+  flex-basis: 50%;
+  padding-left: 40px;
+}
+
+#puzzle-clues ol li {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.clues-active {
+  text-decoration: underline;
+}
+
+#puzzle-clues h2 {
+  margin: 0.3em;
+}
+
+.icon {
+  animation: flow 3s ease-in-out alternate-reverse infinite;
+}
+
+@media (prefers-reduced-motion) {
+  .icon {
+    animation: none;
+  }
+}
+
+.years {
+  position: absolute;
+  inset-block-start: 230px;
+  inset-inline-start: 20px;
+  width: clamp(150px, 15%, 250px);
+  z-index: -1;
+}
+
+.hmm {
+  position: absolute;
+  inset-block-end: -15px;
+  inset-inline-start: 0;
+  width: clamp(300px, 23%, 400px);
+  animation: none;
+  z-index: -1;
+}
+
+.hmm-2 {
+  width: clamp(300px, 90%, 90vw);
+}
+
+.blob {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 35px;
+  width: clamp(155px, 15%, 255px);
+  z-index: -1;
+  animation-delay: 0.2s;
+}
+
+.ufo {
+  position: absolute;
+  inset-block-end: 15px;
+  inset-inline-end: 15%;
+  width: clamp(300px, 25%, 420px);
+  z-index: -1;
+  animation-delay: 0.3s;
+}
+
+.content {
+  max-width: 400px;
+  margin: auto;
+  mix-blend-mode: difference;
+}
+
+@media (width < 1200px) {
+  main {
+    flex-direction: column;
+  }
+}
+
+@media (width < 600px) {
+  #puzzle-wrapper {
+    overflow-x: scroll;
+  }
+}
+
+@keyframes flow {
+  to {
+    translate: 0 15px;
+  }
+}
