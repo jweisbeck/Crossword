@@ -5,7 +5,7 @@
 		// Position refers to the numerical order of an entry. Each position can have 
 		// two entries: an across entry and a down entry
 		var puzzleData = [
-			 	{
+				{
 					clue: "Особенность стиля программирования, когда не знаем выполнится ли то или иное событие.",
 					answer: "Асинхронность",
 					position: 1,
@@ -13,7 +13,7 @@
 					startx: 1,
 					starty: 1
 				},
-			 	{
+				{
 					clue: "Музыкальный инструмент и разворачивающийся блок.",
 					answer: "Аккордеон",
 					position: 1,
