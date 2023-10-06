@@ -193,6 +193,11 @@ input.done {
 #puzzle-clues ol li {
   font-size: 20px;
   cursor: pointer;
+
+}
+
+#puzzle-clues ol li::marker {
+  content: attr(data-order);
 }
 
 .clues-active {
