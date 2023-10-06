@@ -29,7 +29,7 @@
 			
 			// initialize some variables
 			var tbl = ['<table id="puzzle">'],
-			    puzzEl = this,
+				puzzEl = this,
 				clues = $('#puzzle-clues'),
 				clueLiEls,
 				coords,
