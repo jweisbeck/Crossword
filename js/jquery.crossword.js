@@ -291,7 +291,7 @@
 
 					currVal = $('.position-' + activePosition + ' input')
 						.map(function() {
-					  		return $(this)
+							return $(this)
 								.val()
 								.toLowerCase();
 						})
