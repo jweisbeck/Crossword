@@ -100,6 +100,8 @@
 						} else {
 							
 							console.log('input keyup: '+solvedToggle);
+
+							localStorage.setItem(e.target.parentElement.getAttribute('data-coords'), e.originalEvent.key);
 							
 							puzInit.checkAnswer(e);
 
@@ -251,10 +253,12 @@
 								};
 							}
 							
+							var letter = localStorage.getItem(entries[x-1][i])
+
 							if($(light).empty()){
 								$(light)
 									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
-									.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
+									.append('<input maxlength="1" value="' + (letter ? letter : '') + '" type="text" tabindex="-1" />');
 							}
 						};
 						
