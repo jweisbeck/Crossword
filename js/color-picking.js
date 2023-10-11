@@ -13,11 +13,15 @@ const colorNames = {
   '#F498AD': 'Розовый'
 };
 
+document.querySelector('meta[name="theme-color"]').setAttribute('content', colorButton.value)
+
 if (localStorage.getItem('color') !== null) {
   colorButton.value = localStorage.getItem('color')
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', localStorage.getItem('color'))
 } else {
   localStorage.setItem('color', colorButton.value)
 }
+
 body.style.setProperty('--main-color', colorButton.value)
 colorButton.style.setProperty('--bg-color', colorButton.value)
 currentColorOutput.textContent = colorNames[colorButton.value]
@@ -62,4 +66,5 @@ colorButton.addEventListener('click', event => {
   body.style.setProperty('--main-color', colorButton.value)
   currentColorOutput.textContent = colorNames[colorButton.value]
   localStorage.setItem('color', colorButton.value)
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', colorButton.value)
 })

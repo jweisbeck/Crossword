@@ -1,69 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Что за квиз? — День рождения Доки</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta property="og:title" content="🎂Доке 2 года!" />
+    <meta
+      property="og:description"
+      content="Разгадывайте кроссворд по фронтенду и забирайте подарки."
+    />
+    <meta
+      property="og:image"
+      content="https://birthday.doka.guide/2023/images/share-img.png"
+    />
+    <meta property="og:url" content="https://birthday.doka.guide/2023/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://birthday.doka.guide/2023/images/share-img.png"
+    />
+    <meta name="theme-color" content="#C56FFF" />
+    <link rel="icon" href="https://doka.guide/favicon.ico" />
+    <link
+      rel="icon"
+      href="https://doka.guide/images/icons/icon.svg"
+      type="image/svg+xml"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="js/jquery.crossword.js"></script>
+    <script src="js/script.js"></script>
+    <link
+      rel="preload"
+      href="https://doka.guide/fonts/spot-mono/spot-mono-light.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="./styles/pallete.css" />
+    <link rel="stylesheet" href="./styles/style.css" />
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <title>Что за квиз? — День рождения Доки</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta property="og:title" content="🎂Доке 2 года!" />
-  <meta property="og:description" content="Разгадывайте кроссворд по фронтенду и забирайте подарки." />
-  <meta property="og:image" content="https://birthday.doka.guide/2023/images/share-img.png" />
-  <meta property="og:url" content="https://birthday.doka.guide/2023/" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://birthday.doka.guide/2023/images/share-img.png">
-  <link rel="icon" href="https://doka.guide/favicon.ico">
-  <link rel="icon" href="https://doka.guide/images/icons/icon.svg" type="image/svg+xml">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="js/jquery.crossword.js"></script>
-  <script src="js/script.js"></script>
-  <link rel="preload" href="https://doka.guide/fonts/spot-mono/spot-mono-light.woff2" as="font" type="font/woff2"
-    crossorigin="">
-  <link rel="stylesheet" href="./styles/pallete.css">
-  <link rel="stylesheet" href="./styles/style.css">
-</head>
-
-<body>
-  <header class="header">
-    <a href="https://doka.guide/" class="logo">
-      <span class="logo__icon">
-        <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 40">
-          <rect x=".5" y=".5" width="111" height="39" rx="19.5" stroke="currentColor" />
-          <path
-            d="M23.674 30.5c-4.605 0-6.854-2.963-6.854-7.819V10.33c0-.785.428-1.213 1.07-1.213.643 0 1.108.428 1.108 1.213v12.352c0 4.106 1.785 5.784 4.676 5.784 2.963 0 4.748-1.678 4.748-5.784V10.33c0-.785.429-1.213 1.071-1.213.643 0 1.107.428 1.107 1.213v12.352c0 4.856-2.249 7.819-6.926 7.819Zm15.73-.107c-4.605 0-8.14-3.356-8.14-7.997s3.535-7.997 8.14-7.997 8.14 3.356 8.14 7.997c0 4.64-3.535 7.997-8.14 7.997Zm0-1.928c2.927 0 5.534-2.07 5.998-5.105-.536.642-1.321 1.107-2.606 1.107-2.035 0-5.391-2.178-7.105-2.178-1.32 0-2.213 1.142-2.035 2.035.536 2.57 3.106 4.14 5.748 4.14Zm3.677-5.962c1.321 0 2.25-1.107 2.07-2.035-.499-2.535-3.14-4.141-5.747-4.141-2.963 0-5.57 2.106-5.998 5.14.5-.642 1.286-1.142 2.57-1.142 2.036 0 5.392 2.178 7.105 2.178Zm6.983 8.425c-.892 0-1.678-.25-1.678-1.07 0-.5.393-.965.964-.965.215 0 .607.072.857.072 1.143 0 2.5-1.5 3.249-2.57-1.535-1.643-3.213-3.75-3.213-6.07 0-2.677 2.035-4.57 4.855-4.57 2.82 0 4.855 1.893 4.855 4.57 0 2.32-1.678 4.427-3.213 6.07.75 1.07 2.107 2.57 3.249 2.57.25 0 .643-.072.857-.072a.96.96 0 0 1 .964.964c0 .821-.786 1.071-1.678 1.071-2.428 0-3.856-1.5-5.034-3.106-1.178 1.607-2.606 3.106-5.034 3.106Zm20.728-.535c-4.605 0-8.14-3.356-8.14-7.997s3.535-7.997 8.14-7.997 8.14 3.356 8.14 7.997c0 4.64-3.535 7.997-8.14 7.997Zm0-1.928c2.928 0 5.534-2.07 5.998-5.105-.536.642-1.321 1.107-2.606 1.107-2.035 0-5.391-2.178-7.105-2.178-1.32 0-2.213 1.142-2.034 2.035.535 2.57 3.105 4.14 5.747 4.14Zm3.677-5.962c1.321 0 2.25-1.107 2.07-2.035-.499-2.535-3.14-4.141-5.747-4.141-2.963 0-5.569 2.106-5.997 5.14.5-.642 1.285-1.142 2.57-1.142 2.035 0 5.39 2.178 7.104 2.178ZM86.451 30.5c-4.606 0-6.855-2.963-6.855-7.819V10.33c0-.785.428-1.213 1.071-1.213s1.107.428 1.107 1.213v12.352c0 4.106 1.785 5.784 4.677 5.784 2.963 0 4.748-1.678 4.748-5.784V10.33c0-.785.428-1.213 1.07-1.213.643 0 1.107.428 1.107 1.213v12.352c0 4.856-2.249 7.819-6.925 7.819Z"
-            fill="currentColor" />
-        </svg>
-      </span>
-      Дока
-    </a>
-    <nav><a href="./gifts.html" class="nav__item">Подарки</a><a href="./index.html" class="nav__item">Давай назад</a>
-    </nav>
-    <div class="colorpicker">
-      <button style="--bg-color: #C56FFF" class="color__button" value="#C56FFF"><div class="visually-hidden">Сменить цвет</div></button>
-    </div>
-  </header>
-  <div class="main-wrapper">
-    <svg class="icon years" viewBox="0 0 222 190">
-      <use href="./images/2-years.svg#2-years"></use>
-    </svg>
-    <main class="main about">
-      <div class="content">
-        <h2>привет? Здесь кто-нибудь есть?</h2>
-        <p>Дока отмечает своё двухлетие в этом году! Как ни крути, а это было настоящее приключение. Нам захотелось это
-          отметить :)</p>
+  <body>
+    <header class="header">
+      <a href="https://doka.guide/" class="logo">
+        <span class="logo__icon">
+          <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 112 40"
+          >
+            <rect
+              x=".5"
+              y=".5"
+              width="111"
+              height="39"
+              rx="19.5"
+              stroke="currentColor"
+            />
+            <path
+              d="M23.674 30.5c-4.605 0-6.854-2.963-6.854-7.819V10.33c0-.785.428-1.213 1.07-1.213.643 0 1.108.428 1.108 1.213v12.352c0 4.106 1.785 5.784 4.676 5.784 2.963 0 4.748-1.678 4.748-5.784V10.33c0-.785.429-1.213 1.071-1.213.643 0 1.107.428 1.107 1.213v12.352c0 4.856-2.249 7.819-6.926 7.819Zm15.73-.107c-4.605 0-8.14-3.356-8.14-7.997s3.535-7.997 8.14-7.997 8.14 3.356 8.14 7.997c0 4.64-3.535 7.997-8.14 7.997Zm0-1.928c2.927 0 5.534-2.07 5.998-5.105-.536.642-1.321 1.107-2.606 1.107-2.035 0-5.391-2.178-7.105-2.178-1.32 0-2.213 1.142-2.035 2.035.536 2.57 3.106 4.14 5.748 4.14Zm3.677-5.962c1.321 0 2.25-1.107 2.07-2.035-.499-2.535-3.14-4.141-5.747-4.141-2.963 0-5.57 2.106-5.998 5.14.5-.642 1.286-1.142 2.57-1.142 2.036 0 5.392 2.178 7.105 2.178Zm6.983 8.425c-.892 0-1.678-.25-1.678-1.07 0-.5.393-.965.964-.965.215 0 .607.072.857.072 1.143 0 2.5-1.5 3.249-2.57-1.535-1.643-3.213-3.75-3.213-6.07 0-2.677 2.035-4.57 4.855-4.57 2.82 0 4.855 1.893 4.855 4.57 0 2.32-1.678 4.427-3.213 6.07.75 1.07 2.107 2.57 3.249 2.57.25 0 .643-.072.857-.072a.96.96 0 0 1 .964.964c0 .821-.786 1.071-1.678 1.071-2.428 0-3.856-1.5-5.034-3.106-1.178 1.607-2.606 3.106-5.034 3.106Zm20.728-.535c-4.605 0-8.14-3.356-8.14-7.997s3.535-7.997 8.14-7.997 8.14 3.356 8.14 7.997c0 4.64-3.535 7.997-8.14 7.997Zm0-1.928c2.928 0 5.534-2.07 5.998-5.105-.536.642-1.321 1.107-2.606 1.107-2.035 0-5.391-2.178-7.105-2.178-1.32 0-2.213 1.142-2.034 2.035.535 2.57 3.105 4.14 5.747 4.14Zm3.677-5.962c1.321 0 2.25-1.107 2.07-2.035-.499-2.535-3.14-4.141-5.747-4.141-2.963 0-5.569 2.106-5.997 5.14.5-.642 1.285-1.142 2.57-1.142 2.035 0 5.39 2.178 7.104 2.178ZM86.451 30.5c-4.606 0-6.855-2.963-6.855-7.819V10.33c0-.785.428-1.213 1.071-1.213s1.107.428 1.107 1.213v12.352c0 4.106 1.785 5.784 4.677 5.784 2.963 0 4.748-1.678 4.748-5.784V10.33c0-.785.428-1.213 1.07-1.213.643 0 1.107.428 1.107 1.213v12.352c0 4.856-2.249 7.819-6.925 7.819Z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+        Дока
+      </a>
+      <nav>
+        <a href="./gifts.html" class="nav__item">Подарки</a
+        ><a href="./index.html" class="nav__item">Давай назад</a>
+      </nav>
+      <div class="colorpicker">
+        <button
+          style="--bg-color: #c56fff"
+          class="color__button"
+          value="#C56FFF"
+        >
+          <div class="visually-hidden">Сменить цвет</div>
+        </button>
       </div>
-    </main>
-  </div>
-  <svg class="icon hmm" viewBox="0 0 428 353">
-    <use href="./images/hmm.svg#hmm"></use>
-  </svg>
-  <svg class="icon blob" viewBox="0 0 256 171">
-    <use href="./images/blob.svg#blob"></use>
-  </svg>
-  <svg class="icon ufo" viewBox="0 0 420 233">
-    <use href="./images/ufo.svg#ufo"></use>
-  </svg>
-  <script src="./js/color-picking.js"></script>
-</body>
-
+    </header>
+    <div class="main-wrapper">
+      <svg class="icon years" viewBox="0 0 222 190">
+        <use href="./images/2-years.svg#2-years"></use>
+      </svg>
+      <main class="main about">
+        <div class="content">
+          <h2>привет? Здесь кто-нибудь есть?</h2>
+          <p>
+            Дока отмечает своё двухлетие в этом году! Как ни крути, а это было
+            настоящее приключение. Нам захотелось это отметить :)
+          </p>
+        </div>
+      </main>
+    </div>
+    <svg class="icon hmm" viewBox="0 0 428 353">
+      <use href="./images/hmm.svg#hmm"></use>
+    </svg>
+    <svg class="icon blob" viewBox="0 0 256 171">
+      <use href="./images/blob.svg#blob"></use>
+    </svg>
+    <svg class="icon ufo" viewBox="0 0 420 233">
+      <use href="./images/ufo.svg#ufo"></use>
+    </svg>
+    <script src="./js/color-picking.js"></script>
+  </body>
 </html>
