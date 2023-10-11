@@ -12,7 +12,7 @@ html {
 body {
   position: relative;
   min-height: 100dvb;
-  margin: 10px auto;
+  margin: 0;
   font-family: 'Spot Mono', sans-serif;
   font-weight: 300;
   font-size: 20px;
@@ -36,7 +36,6 @@ a:focus-visible {
 
 h2 {
   font-size: 22px;
-  line-height: 1.6em;
   text-transform: uppercase;
   font-weight: 300;
 }
@@ -50,7 +49,7 @@ p {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1280px;
+  max-width: 1680px;
   margin: auto;
   padding: 40px;
 }
@@ -69,10 +68,20 @@ p {
   color: var(--main-color)
 }
 
+nav {
+  display: flex;
+  gap: 20px;
+}
+
 .nav__item {
   font-size: 22px;
   text-transform: uppercase;
   mix-blend-mode: difference;
+}
+
+.nav__item:not(:last-child)::after {
+  content: "◦";
+  margin-left: 20px;
 }
 
 .colorpicker {
@@ -110,12 +119,21 @@ p {
   scale: 1.8;
 }
 
+.main-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;  
+  gap: 20px;
+  max-width: 1680px;
+  margin: auto;
+  padding: 50px 50px 150px;
+}
+
 main {
   display: flex;
-  align-items: center;
-  max-width: 1280px;
-  margin: auto;
-  padding: 250px 50px;
+  align-items: flex-start;
+  flex-basis: 85%;
+  gap: 50px;
 }
 
 .about {
@@ -152,10 +170,6 @@ td input {
   background-color: transparent;
 }
 
-td input:focus {
-
-}
-
 td span {
   position: absolute;
   top: 1px;
@@ -176,24 +190,31 @@ input.done {
 
 #puzzle-wrapper {
   flex-basis: 50%;
-  margin-right: 3%;
   padding: 20px;
   background-color: #000;
 }
 
 #puzzle {
-  min-width: 600px;
+  min-width: 550px;
 }
 
 #puzzle-clues {
   flex-basis: 50%;
-  padding-left: 40px;
+}
+
+#puzzle-clues ol {
+  margin-block-start: 0;
+  margin-block-end: 40px;
 }
 
 #puzzle-clues ol li {
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 17px;
   cursor: pointer;
+}
 
+#puzzle-clues ol li + li {
+  margin-block-start: 5px;
 }
 
 #puzzle-clues ol li::marker {
@@ -209,6 +230,8 @@ input.done {
 }
 
 .icon {
+  position: relative;
+  z-index: -1;
   animation: flow 3s ease-in-out alternate-reverse infinite;
 }
 
@@ -219,11 +242,8 @@ input.done {
 }
 
 .years {
-  position: absolute;
-  inset-block-start: 230px;
-  inset-inline-start: 20px;
-  width: clamp(150px, 15%, 250px);
-  z-index: -1;
+  flex-basis: 12%;
+  max-width: 200px;
 }
 
 .hmm {
@@ -232,7 +252,6 @@ input.done {
   inset-inline-start: 0;
   width: clamp(300px, 23%, 400px);
   animation: none;
-  z-index: -1;
 }
 
 .hmm-2 {
@@ -244,16 +263,14 @@ input.done {
   inset-block-start: 0;
   inset-inline-end: 35px;
   width: clamp(155px, 15%, 255px);
-  z-index: -1;
   animation-delay: 0.2s;
 }
 
 .ufo {
   position: absolute;
-  inset-block-end: 15px;
+  inset-block-end: 0;
   inset-inline-end: 15%;
   width: clamp(300px, 25%, 420px);
-  z-index: -1;
   animation-delay: 0.3s;
 }
 
@@ -263,14 +280,81 @@ input.done {
   mix-blend-mode: difference;
 }
 
+.content h2 {
+  margin-block-end: 40px;
+}
+
+.content p {
+  padding-inline-start: 40px;
+}
+
+.share {
+  margin-block-start: 40px;
+}
+
+.socials {
+  display: inline-flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.socials li {
+  padding: 5px;
+}
+
+.visually-hidden {
+  position: absolute;
+  margin: -1px;
+  clip-path: inset(50%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
 @media (width < 1200px) {
-  main {
+  .colorpicker {
+    inset: initial;
+    inset-block-start: 120px;
+    inset-inline-start: 47px;    
+  }
+
+  .colors {
     flex-direction: column;
+  }
+
+  .main-wrapper, main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main-wrapper {
+    padding-block-end: 250px;
+  }
+
+  .years {
+    max-width: 150px;
   }
 }
 
 @media (width < 600px) {
+  .main-wrapper {
+    padding-block-start: 10px;
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
+  }
+
+  main {
+    width: 100%;
+  }
+
   #puzzle-wrapper {
+    width: 100%;
     overflow-x: scroll;
   }
 }
