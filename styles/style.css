@@ -22,7 +22,8 @@ body {
 
 a {
   color: currentColor;
-  text-decoration: none;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
 }
 
 a:focus {
@@ -31,6 +32,8 @@ a:focus {
 
 a:hover,
 a:focus-visible {
+  outline: 1px solid;
+  outline-offset: 2px;
   text-decoration: underline;
 }
 
@@ -42,6 +45,10 @@ h2 {
 
 p {
   margin: 0;
+}
+
+p + p {
+  margin-bottom: 10px;
 }
 
 .header {
@@ -76,6 +83,7 @@ nav {
 .nav__item {
   font-size: 22px;
   text-transform: uppercase;
+  text-decoration: none;
   mix-blend-mode: difference;
   transform: translate3d(0,0,0); /* Хак для починки Safari */
 }
@@ -143,7 +151,7 @@ main {
 }
 
 .about {
-  height: 60dvb;
+  min-height: 60dvb;
   padding-block: 0;
 }
 
