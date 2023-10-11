@@ -86,37 +86,35 @@ nav {
 
 .colorpicker {
   position: absolute;
-  inset: 50%;
+  left: 50%;
+  width: 75px;
+  height: 75px;
+  cursor: pointer;
+  animation: rotation 8s linear infinite;
 }
 
-.colors {
-  position: relative;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.color input {
-  display: none;
-}
-
-.color-label {
-  width: 15px;
-  color: var(--bg-color);
-  display: block;
+.color__button {
+  position: absolute;
+  top: calc(50% - 17px);
+  left: calc(50% - 17px);
+  z-index: 10;
+  width: 35px;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background-color: currentColor;
-  transition: scale 0.2s;
-  transform-origin: center;
+  border: none;
+  background-color: var(--bg-color);
   cursor: pointer;
+  transition: 0.2s;
 }
 
-.color-label:has(:checked) {
-  scale: 1.8;
+.color__other {
+  position: absolute;
+  z-index: -1;
+  width: 20px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: var(--bg-color);
+  transition: 0.2s;
 }
 
 .main-wrapper {
@@ -362,5 +360,11 @@ input.done {
 @keyframes flow {
   to {
     translate: 0 15px;
+  }
+}
+
+@keyframes rotation {
+  to {
+    rotate: 360deg;
   }
 }
