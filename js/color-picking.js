@@ -2,15 +2,25 @@ const body = document.body
 const colorsContainer = document.querySelector('.colorpicker')
 const colors = ['#C56FFF', '#FF8630', '#2E9AFF', '#41E847', '#FFD829', '#F498AD']
 const colorButton = document.querySelector('.color__button')
+const currentColorOutput = document.getElementById('currentColor')
 
-if (localStorage.getItem('color') === null) {
-  localStorage.setItem('color', colorButton.value)
-  body.style.setProperty('--main-color', colorButton.value)
-} else {
-  body.style.setProperty('--main-color', localStorage.getItem('color'))
+const colorNames = {
+  '#C56FFF': 'Фиолетовый',
+  '#FF8630': 'Оранжевый',
+  '#2E9AFF': 'Голубой',
+  '#41E847': 'Зелёный',
+  '#FFD829': 'Жёлтый',
+  '#F498AD': 'Розовый'
+};
+
+if (localStorage.getItem('color') !== null) {
   colorButton.value = localStorage.getItem('color')
-  colorButton.style.setProperty('--bg-color', localStorage.getItem('color'))
+} else {
+  localStorage.setItem('color', colorButton.value)
 }
+body.style.setProperty('--main-color', colorButton.value)
+colorButton.style.setProperty('--bg-color', colorButton.value)
+currentColorOutput.textContent = colorNames[colorButton.value]
 
 generateOtherColors()
 
@@ -50,5 +60,6 @@ colorButton.addEventListener('click', event => {
   removeOtherColors()
   generateOtherColors()
   body.style.setProperty('--main-color', colorButton.value)
+  currentColorOutput.textContent = colorNames[colorButton.value]
   localStorage.setItem('color', colorButton.value)
 })

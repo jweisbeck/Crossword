@@ -38,7 +38,14 @@
     </a>
     <nav><a href="./gifts.html" class="nav__item">Подарки</a><a href="./about.html" class="nav__item">Где я?</a></nav>
     <div class="colorpicker">
-      <button style="--bg-color: #C56FFF" class="color__button" value="#C56FFF"><div class="visually-hidden">Сменить цвет</div></button>
+      <button style="--bg-color: #C56FFF" class="color__button" value="#C56FFF">
+        <span class="visually-hidden">Сменить цвет</span>
+      </button>
+      <div class="visually-hidden">
+        <label for="currentColor">Выбранный цвет:</label>
+        <output id="currentColor">
+        </output>
+      </div> 
     </div>
   </header>
   <div class="main-wrapper">
