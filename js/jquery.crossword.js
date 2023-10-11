@@ -101,7 +101,22 @@
 							
 							console.log('input keyup: '+solvedToggle);
 
-							localStorage.setItem(e.target.parentElement.getAttribute('data-coords'), e.originalEvent.key);
+							if (
+								(e.keyCode >= 65 && e.keyCode <= 90) // Regular cyrillic characters keys
+							// Extended cyrillic characters keys
+							// ------------------------------------
+							|| e.keyCode === 186
+							|| e.keyCode === 188
+							|| e.keyCode === 190
+							|| e.keyCode === 192
+							|| e.keyCode === 219
+							|| e.keyCode === 220
+							|| e.keyCode === 221
+							|| e.keyCode === 222
+							// ------------------------------------
+							) {
+								localStorage.setItem(e.target.parentElement.getAttribute('data-coords'), e.originalEvent.key);
+							}
 							
 							puzInit.checkAnswer(e);
 
