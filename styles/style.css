@@ -209,6 +209,7 @@ input.done {
 }
 
 #puzzle-clues ol {
+  list-style: none;
   margin-block-start: 0;
   margin-block-end: 40px;
 }
@@ -224,7 +225,7 @@ input.done {
   margin-block-start: 5px;
 }
 
-#puzzle-clues ol li::marker {
+#puzzle-clues ol li::before {
   content: attr(data-order);
 }
 
