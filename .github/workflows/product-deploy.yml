@@ -1,0 +1,25 @@
+name: Развёртывание кроссворда
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  product-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Загрузка репозитория
+        uses: actions/checkout@v4
+      - name: Установка ключа для пользователя
+        run: |
+          set -eu
+          mkdir "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          echo "${{ secrets.DEPLOY_KEY }}" > "$HOME/.ssh/id_rsa"
+          chmod 600 "$HOME/.ssh/id_rsa"
+      - name: Развёртывание приложения
+        run: |
+          ssh-keyscan -H birthday.doka.guide >> ~/.ssh/known_hosts
+          rsync --archive --progress --compress --delete . birthday.doka.guide:/web/sites/birthday.doka.guide/www/2023
