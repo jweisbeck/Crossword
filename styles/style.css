@@ -70,7 +70,7 @@ p {
 
 nav {
   display: flex;
-  gap: 20px;
+  gap: 50px;
 }
 
 .nav__item {
@@ -81,6 +81,7 @@ nav {
 
 .nav__item:not(:last-child)::after {
   content: "◦";
+  position: absolute;
   margin-left: 20px;
 }
 
