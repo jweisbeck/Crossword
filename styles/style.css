@@ -209,6 +209,7 @@ input.done {
   font-size: 18px;
   line-height: 17px;
   cursor: pointer;
+  padding-bottom: 8px;
 }
 
 #puzzle-clues ol li + li {
