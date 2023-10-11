@@ -335,21 +335,17 @@ input.done {
 
 @media (width < 1200px) {
   .colorpicker {
-    inset: initial;
-    inset-block-start: 120px;
-    inset-inline-start: 47px;    
-  }
-
-  .colors {
-    flex-direction: column;
+    top: 150px;
+    left: auto;
+    right: 40px;    
   }
 
   .main-wrapper, main {
     flex-direction: column;
-    align-items: center;
   }
 
   .main-wrapper {
+    padding-block-start: 0;
     padding-block-end: 250px;
   }
 
@@ -363,6 +359,25 @@ input.done {
 }
 
 @media (width < 600px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 20px;    
+    padding: 10px;
+  }
+
+  .logo {
+    font-size: 30px;
+  }
+
+  .logo__icon {
+    width: 84px;
+    height: 30px;
+  }  
+
+  .colorpicker {
+    right: 10px;    
+  }  
+
   .main-wrapper {
     padding-block-start: 10px;
     padding-inline-start: 10px;
