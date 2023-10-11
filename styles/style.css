@@ -296,6 +296,15 @@ input.done {
   margin-block-start: 40px;
 }
 
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  max-width: 1680px;
+  margin: auto;
+  padding: 40px 40px 25px;
+}
+
 .socials {
   display: inline-flex;
   gap: 10px;
@@ -344,6 +353,10 @@ input.done {
   .years {
     max-width: 150px;
   }
+
+  .ufo {
+    inset-inline-end: 0;
+  }
 }
 
 @media (width < 600px) {
@@ -360,6 +373,15 @@ input.done {
   #puzzle-wrapper {
     width: 100%;
     overflow-x: scroll;
+  }
+
+  .footer {
+    justify-content: flex-end;
+    padding: 10px 10px 0;
+  }
+
+  .ufo {
+    display: none;    
   }
 }
 
