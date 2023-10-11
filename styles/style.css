@@ -93,6 +93,12 @@ nav {
   animation: rotation 8s linear infinite;
 }
 
+@media (prefers-reduced-motion) {
+  .colorpicker {
+    animation: none;
+  }
+}
+
 .color__button {
   position: absolute;
   top: calc(50% - 17px);
