@@ -10,9 +10,6 @@ const initCanvas = (canvas, color) => {
   }
 
   try {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
     let vertexShaderSource = `
               attribute vec4 a_position;
               void main() {
@@ -131,9 +128,25 @@ const initCanvas = (canvas, color) => {
       return program;
     }
 
+    function resizeCanvasToDisplaySize(canvas) {
+      const displayWidth  = canvas.clientWidth;
+      const displayHeight = canvas.clientHeight;
+      if (window.devicePixelRatio > 1) {
+        canvas.width = displayWidth * window.devicePixelRatio;
+        canvas.height = displayHeight * window.devicePixelRatio;
+        canvas.style.width = displayWidth + "px";
+        canvas.style.height = displayHeight + "px";
+      } else {
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+      }
+    }
+
     function drawScene(time) {
+
       time *= 0.002; // convert to seconds
 
+      resizeCanvasToDisplaySize(gl.canvas);
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
