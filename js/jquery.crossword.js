@@ -25,11 +25,11 @@
 			
 			// append clues markup after puzzle wrapper div
 			// This should be moved into a configuration object
-			this.after('<div id="puzzle-clues"><h2>Across</h2><ol id="across"></ol><h2>Down</h2><ol id="down"></ol></div>');
+			this.after('<div id="puzzle-clues"><h2>По горизонтали</h2><ol id="across"></ol><h2>По вертикали</h2><ol id="down"></ol></div>');
 			
 			// initialize some variables
 			var tbl = ['<table id="puzzle">'],
-			    puzzEl = this,
+				puzzEl = this,
 				clues = $('#puzzle-clues'),
 				clueLiEls,
 				coords,
@@ -100,6 +100,23 @@
 						} else {
 							
 							console.log('input keyup: '+solvedToggle);
+
+							if (
+								(e.keyCode >= 65 && e.keyCode <= 90) // Regular cyrillic characters keys
+							// Extended cyrillic characters keys
+							// ------------------------------------
+							|| e.keyCode === 186
+							|| e.keyCode === 188
+							|| e.keyCode === 190
+							|| e.keyCode === 192
+							|| e.keyCode === 219
+							|| e.keyCode === 220
+							|| e.keyCode === 221
+							|| e.keyCode === 222
+							// ------------------------------------
+							) {
+								localStorage.setItem(e.target.parentElement.getAttribute('data-coords'), e.originalEvent.key);
+							}
 							
 							puzInit.checkAnswer(e);
 
@@ -191,7 +208,7 @@
 						}
 
 						// while we're in here, add clues to DOM!
-						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-position="' + i + '">' + puzz.data[i].clue + '</li>'); 
+						$('#' + puzz.data[i].orientation).append('<li tabindex="1" data-order="' + (i === 0 ? 1 : i) + '. " data-position="' + i + '">' + puzz.data[i].clue + '</li>'); 
 					}				
 					
 					// Calculate rows/cols by finding max coords of each entry, then picking the highest
@@ -251,14 +268,16 @@
 								};
 							}
 							
+							var letter = localStorage.getItem(entries[x-1][i])
+
 							if($(light).empty()){
 								$(light)
 									.addClass('entry-' + (hasOffset ? x - positionOffset : x) + ' position-' + (x-1) )
-									.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
+									.append('<input maxlength="1" value="' + (letter ? letter : '') + '" type="text" tabindex="-1" />');
 							}
 						};
 						
-					};	
+					};
 					
 					// Put entry number in first 'light' of each entry, skipping it if already present
 					for (var i=1, p = entryCount; i < p; ++i) {
@@ -291,7 +310,7 @@
 
 					currVal = $('.position-' + activePosition + ' input')
 						.map(function() {
-					  		return $(this)
+							return $(this)
 								.val()
 								.toLowerCase();
 						})

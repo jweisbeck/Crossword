@@ -1,0 +1,425 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  transition: color, border 0.1s;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  position: relative;
+  min-height: 100dvb;
+  margin: 0;
+  font-family: 'Spot Mono', sans-serif;
+  font-weight: 300;
+  font-size: 20px;
+  background-color: #000;
+  color: var(--main-color);
+}
+
+a {
+  color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+a:focus {
+  outline: none;
+}
+
+a:hover,
+a:focus-visible {
+  outline: 1px solid;
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+h2 {
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+p {
+  margin: 0;
+}
+
+p + p {
+  margin-bottom: 10px;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1680px;
+  margin: auto;
+  padding: 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 35px;
+}
+
+.logo__icon {
+  display: block;
+  width: 112px;
+  height: 40px;
+  color: var(--main-color)
+}
+
+nav {
+  display: flex;
+  gap: 50px;
+}
+
+.nav__item {
+  font-size: 22px;
+  text-transform: uppercase;
+  text-decoration: none;
+  mix-blend-mode: difference;
+  transform: translate3d(0,0,0); /* Хак для починки Safari */
+}
+
+.nav__item:not(:last-child)::after {
+  content: "◦";
+  position: absolute;
+  margin-left: 20px;
+}
+
+.colorpicker {
+  position: absolute;
+  left: 50%;
+  width: 75px;
+  height: 75px;
+  cursor: pointer;
+  animation: rotation 8s linear infinite;
+}
+
+@media (prefers-reduced-motion) {
+  .colorpicker {
+    animation: none;
+  }
+}
+
+.color__button {
+  position: absolute;
+  top: calc(50% - 17px);
+  left: calc(50% - 17px);
+  z-index: 10;
+  width: 35px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--bg-color);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.color__other {
+  position: absolute;
+  z-index: -1;
+  width: 20px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: var(--bg-color);
+  transition: 0.2s;
+}
+
+.main-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;  
+  gap: 20px;
+  max-width: 1680px;
+  margin: auto;
+  padding: 50px 50px 150px;
+}
+
+main {
+  display: flex;
+  align-items: flex-start;
+  flex-basis: 85%;
+  gap: 50px;
+}
+
+.about {
+  min-height: 60dvb;
+  padding-block: 0;
+}
+
+table {
+  max-width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table tr {
+  width: 100%;
+}
+
+table td {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+td input {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: none;
+  padding: 0em;
+  color: #fff;
+  font-size: 30px;
+  border: 1px solid var(--main-color);
+  text-align: center;
+  text-transform: uppercase;
+  background-color: transparent;
+}
+
+td span {
+  position: absolute;
+  top: 1px;
+  left: 3px;
+  font-size: 15px;
+}
+
+input.done {
+  color: green;
+}
+
+.active,
+.clues-active {
+}
+.clue-done {
+  text-decoration: line-through;
+}
+
+#puzzle-wrapper {
+  flex-basis: 50%;
+  padding: 20px;
+  background-color: #000;
+}
+
+#puzzle {
+  min-width: 550px;
+}
+
+#puzzle-clues {
+  flex-basis: 50%;
+}
+
+#puzzle-clues ol {
+  list-style: none;
+  margin-block-start: 0;
+  margin-block-end: 40px;
+}
+
+#puzzle-clues ol li {
+  font-size: 18px;
+  line-height: 17px;
+  cursor: pointer;
+  padding-bottom: 8px;
+}
+
+#puzzle-clues ol li + li {
+  margin-block-start: 5px;
+}
+
+#puzzle-clues ol li::before {
+  content: attr(data-order);
+}
+
+.clues-active {
+  text-decoration: underline;
+}
+
+#puzzle-clues h2 {
+  margin: 0.3em;
+}
+
+.icon {
+  position: relative;
+  z-index: -1;
+  animation: flow 3s ease-in-out alternate-reverse infinite;
+}
+
+@media (prefers-reduced-motion) {
+  .icon {
+    animation: none;
+  }
+}
+
+.years {
+  flex-basis: 12%;
+  max-width: 200px;
+}
+
+.hmm {
+  position: absolute;
+  inset-block-end: -15px;
+  inset-inline-start: 0;
+  width: clamp(300px, 23%, 400px);
+  animation: none;
+}
+
+.hmm-2 {
+  width: clamp(300px, 90%, 90vw);
+}
+
+.blob {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 35px;
+  width: clamp(155px, 15%, 255px);
+  animation-delay: 0.2s;
+}
+
+.ufo {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 15%;
+  width: clamp(300px, 25%, 420px);
+  animation-delay: 0.3s;
+}
+
+.content {
+  max-width: 400px;
+  margin: auto;
+  mix-blend-mode: difference;
+}
+
+.content h2 {
+  margin-block-end: 40px;
+}
+
+.content p {
+  padding-inline-start: 40px;
+}
+
+.share {
+  margin-block-start: 40px;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  max-width: 1680px;
+  margin: auto;
+  padding: 40px 40px 25px;
+}
+
+.socials {
+  display: inline-flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.socials li {
+  padding: 5px;
+}
+
+.visually-hidden {
+  position: absolute;
+  margin: -1px;
+  clip-path: inset(50%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+@media (width < 1200px) {
+  .colorpicker {
+    top: 150px;
+    left: auto;
+    right: 40px;    
+  }
+
+  .main-wrapper, main {
+    flex-direction: column;
+  }
+
+  .main-wrapper {
+    padding-block-start: 0;
+    padding-block-end: 250px;
+  }
+
+  .years {
+    max-width: 150px;
+  }
+
+  .ufo {
+    inset-inline-end: 0;
+  }
+}
+
+@media (width < 600px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 20px;    
+    padding: 10px;
+  }
+
+  .logo {
+    font-size: 30px;
+  }
+
+  .logo__icon {
+    width: 84px;
+    height: 30px;
+  }  
+
+  .colorpicker {
+    right: 10px;    
+  }  
+
+  .main-wrapper {
+    padding-block-start: 10px;
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
+  }
+
+  main {
+    width: 100%;
+  }
+
+  #puzzle-wrapper {
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  .footer {
+    justify-content: flex-end;
+    padding: 10px 10px 0;
+  }
+
+  .ufo {
+    display: none;    
+  }
+}
+
+@keyframes flow {
+  to {
+    translate: 0 15px;
+  }
+}
+
+@keyframes rotation {
+  to {
+    rotate: 360deg;
+  }
+}
