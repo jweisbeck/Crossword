@@ -1,12 +1,3 @@
-const colors = [
-  "#C56FFF",
-  "#FF8630",
-  "#2E9AFF",
-  "#41E847",
-  "#FFD829",
-  "#F498AD",
-];
-
 const colorNames = {
   "#C56FFF": "Фиолетовый",
   "#FF8630": "Оранжевый",
@@ -17,6 +8,7 @@ const colorNames = {
 };
 
 const init = (body) => {
+  const colors = Object.keys(colorNames);
   const colorsContainer = document.querySelector(".colorpicker");
   const colorButton = document.querySelector(".color__button");
   const currentColorOutput = document.getElementById("currentColor");
